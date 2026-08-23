@@ -17,6 +17,7 @@
             --input-bg: #f8fafc;
             --success-green: #10b981;
             --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
         }
 
         * {
@@ -34,7 +35,7 @@
             background-color: var(--bg-page);
             color: var(--text-dark);
             min-height: 100vh;
-            display: flex; /* Script controls visibility */
+            display: flex;
             flex-direction: column;
             align-items: center;
             padding-bottom: 40px;
@@ -126,8 +127,14 @@
             gap: 16px;
         }
 
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
         @media (max-width: 640px) {
-            .grid-2, .grid-3 {
+            .grid-2, .grid-3, .grid-4 {
                 grid-template-columns: 1fr;
             }
         }
@@ -161,7 +168,6 @@
             background-color: #ffffff;
         }
 
-        /* Profile Upload Area */
         .profile-upload-container {
             display: flex;
             align-items: center;
@@ -197,7 +203,6 @@
             padding: 4px;
         }
 
-        /* Metrics Stat Box */
         .stat-box {
             background: #f8fafc;
             border: 1px solid var(--border-color);
@@ -219,7 +224,6 @@
             margin-top: 4px;
         }
 
-        /* Table Design */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -251,7 +255,20 @@
         .badge-green { background: #d1fae5; color: #065f46; }
         .badge-orange { background: #fef3c7; color: #92400e; }
 
-        /* Calendar Grid */
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--danger-red);
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 700;
+            padding: 2px 6px;
+        }
+
+        .btn-delete:hover {
+            color: #b91c1c;
+        }
+
         .calendar-header {
             display: flex;
             justify-content: space-between;
@@ -291,7 +308,6 @@
             font-size: 12px;
             cursor: pointer;
             background: #ffffff;
-
             transition: all 0.15s ease;
         }
 
@@ -312,7 +328,19 @@
 
         .btn-primary:hover { background: var(--accent-blue-hover); }
 
-        /* Modal Styles */
+        .btn-secondary {
+            background: #f1f5f9;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-secondary:hover { background: #e2e8f0; }
+
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -330,6 +358,30 @@
             max-width: 400px;
             width: 90%;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .adherence-container {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--success-green);
+            width: 0%;
+            transition: width 0.3s ease;
         }
     </style>
 
@@ -419,7 +471,7 @@
     <!-- Daily Targets -->
     <section class="card">
         <div class="card-title">Nutrition Calibration</div>
-        <div class="grid-3">
+        <div class="grid-3" style="margin-bottom: 16px;">
             <div class="stat-box">
                 <div class="stat-value" id="targetGrams">0g</div>
                 <div class="stat-label">Target Protein</div>
@@ -433,13 +485,37 @@
                 <div class="stat-label">Per Meal Target (4x)</div>
             </div>
         </div>
+
+        <!-- Full Macronutrient Distribution Breakdown -->
+        <div class="card-title" style="font-size: 15px; margin-bottom: 12px;">Full Macronutrient Plan Target</div>
+        <div class="grid-4">
+            <div class="stat-box">
+                <div class="stat-value" id="targetCalories" style="color: var(--primary-navy);">0 kcal</div>
+                <div class="stat-label">Daily Calories</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="targetCarbs" style="color: #0284c7;">0g</div>
+                <div class="stat-label">Carbohydrates</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="targetFats" style="color: #d97706;">0g</div>
+                <div class="stat-label">Dietary Fats</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="targetWater" style="color: var(--accent-blue);">0 oz</div>
+                <div class="stat-label">Hydration Target</div>
+            </div>
+        </div>
     </section>
 
     <!-- Tracker & Calendar -->
     <div class="grid-2">
         <!-- Weight Logs -->
         <section class="card">
-            <div class="card-title">Weight Log History</div>
+            <div class="card-title">
+                <span>Weight Log History</span>
+                <button class="btn-secondary" onclick="exportWeightLogsCSV()">Export CSV</button>
+            </div>
             <div class="form-group">
                 <label for="logDate">Date</label>
                 <input type="date" id="logDate">
@@ -457,6 +533,7 @@
                         <th>Weight</th>
                         <th>Diff</th>
                         <th>Status</th>
+                        <th style="text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="weightHistoryBody"></tbody>
@@ -476,6 +553,17 @@
                 <button class="calendar-nav-btn" onclick="changeMonth(1)">&gt;</button>
             </div>
             <div id="calendarGrid" class="calendar-grid"></div>
+
+            <div class="adherence-container">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
+                    <span>Monthly Adherence Score</span>
+                    <span id="adherencePercent" style="color: var(--success-green);">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="adherenceFill" class="progress-bar-fill"></div>
+                </div>
+                <div id="adherenceStats" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">0 of 0 days completed</div>
+            </div>
         </section>
     </div>
 
@@ -541,7 +629,6 @@
                 document.body.style.display = 'flex';
                 loadUserDataFromFirestore(user);
             } else {
-                // Redirect if unauthenticated on remote host
                 if (window.location.protocol !== 'file:') {
                     window.location.replace('index.html');
                 } else {
@@ -550,11 +637,9 @@
             }
         });
     } else {
-        // Local fallback when running offline or on file://
         document.body.style.display = 'flex';
     }
 
-    // Force display on DOM Ready for local file preview
     document.addEventListener('DOMContentLoaded', function() {
         if (window.location.protocol === 'file:') {
             document.body.style.display = 'flex';
@@ -580,7 +665,6 @@
         });
     });
 
-    // Populate user profile from Firestore
     async function loadUserDataFromFirestore(user) {
         if (!db) return;
         const emailInput = document.getElementById('userEmail');
@@ -602,7 +686,6 @@
         }
     }
 
-    // SIGN OUT & SAVE TRACKER DATA
     async function handleLogout() {
         saveFormData();
         saveTrackerData();
@@ -641,54 +724,78 @@
             userPhone: document.getElementById('userPhone')?.value || '',
             prefChannel: document.getElementById('prefChannel')?.value || ''
         };
-        localStorage.setItem('portal_form_data', JSON.stringify(formData));
+        try {
+            localStorage.setItem('portal_form_data', JSON.stringify(formData));
+        } catch (e) {
+            console.warn('LocalStorage quota exceeded or unavailable', e);
+        }
     }
 
     function loadFormData() {
-        const saved = localStorage.getItem('portal_form_data');
-        if (!saved) return;
+        try {
+            const saved = localStorage.getItem('portal_form_data');
+            if (!saved) return;
 
-        const data = JSON.parse(saved);
-        Object.keys(data).forEach(id => {
-            const elem = document.getElementById(id);
-            if (elem && data[id] !== undefined && data[id] !== "") {
-                elem.value = data[id];
-            }
-        });
+            const data = JSON.parse(saved);
+            Object.keys(data).forEach(id => {
+                const elem = document.getElementById(id);
+                if (elem && data[id] !== undefined && data[id] !== "") {
+                    elem.value = data[id];
+                }
+            });
+        } catch (e) {
+            console.error('Error loading form data:', e);
+        }
     }
 
     function saveTrackerData() {
-        localStorage.setItem('portal_weight_logs', JSON.stringify(weightLogs));
-        localStorage.setItem('portal_completed_days', JSON.stringify(Array.from(completedDays)));
+        try {
+            localStorage.setItem('portal_weight_logs', JSON.stringify(weightLogs));
+            localStorage.setItem('portal_completed_days', JSON.stringify(Array.from(completedDays)));
+        } catch (e) {
+            console.warn('LocalStorage quota exceeded or unavailable', e);
+        }
     }
 
     function loadTrackerData() {
-        const savedLogs = localStorage.getItem('portal_weight_logs');
-        if (savedLogs) {
-            weightLogs = JSON.parse(savedLogs);
-        }
+        try {
+            const savedLogs = localStorage.getItem('portal_weight_logs');
+            if (savedLogs) {
+                weightLogs = JSON.parse(savedLogs);
+            }
 
-        const savedDays = localStorage.getItem('portal_completed_days');
-        if (savedDays) {
-            const daysArray = JSON.parse(savedDays);
-            completedDays = new Set(daysArray);
+            const savedDays = localStorage.getItem('portal_completed_days');
+            if (savedDays) {
+                const daysArray = JSON.parse(savedDays);
+                completedDays = new Set(daysArray);
+            }
+        } catch (e) {
+            console.error('Error loading tracker data:', e);
         }
     }
 
     function saveProfileImage(base64Data) {
-        localStorage.setItem('portal_profile_img', base64Data);
+        try {
+            localStorage.setItem('portal_profile_img', base64Data);
+        } catch (e) {
+            console.warn('Unable to cache profile image to LocalStorage', e);
+        }
     }
 
     function loadProfileImage() {
-        const savedImg = localStorage.getItem('portal_profile_img');
-        if (savedImg) {
-            const img = document.getElementById('profileImg');
-            if (img) {
-                img.src = savedImg;
-                img.style.display = 'block';
+        try {
+            const savedImg = localStorage.getItem('portal_profile_img');
+            if (savedImg) {
+                const img = document.getElementById('profileImg');
+                if (img) {
+                    img.src = savedImg;
+                    img.style.display = 'block';
+                }
+                const uploadText = document.getElementById('uploadText');
+                if (uploadText) uploadText.style.display = 'none';
             }
-            const uploadText = document.getElementById('uploadText');
-            if (uploadText) uploadText.style.display = 'none';
+        } catch (e) {
+            console.error('Error loading profile image:', e);
         }
     }
 
@@ -759,16 +866,38 @@
 
         if (activity === 'heavy') multiplier += 0.05;
 
-        const totalGrams = Math.round(weight * multiplier);
-        const perMealGrams = Math.round(totalGrams / 4);
+        const totalProteinGrams = Math.round(weight * multiplier);
+        const perMealGrams = Math.round(totalProteinGrams / 4);
+
+        // Full Macronutrient Targets Calculation
+        let calorieMultiplier = 13;
+        if (goal === 'fat_loss') calorieMultiplier = 11.5;
+        else if (goal === 'hypertrophy') calorieMultiplier = 15;
+
+        if (activity === 'heavy') calorieMultiplier += 1.0;
+
+        const totalCalories = Math.round(weight * calorieMultiplier);
+        const fatGrams = Math.round((totalCalories * 0.25) / 9);
+        const carbGrams = Math.max(0, Math.round((totalCalories - (totalProteinGrams * 4) - (fatGrams * 9)) / 4));
+        const hydrationOz = Math.round(weight * 0.67);
 
         const targetGrams = document.getElementById('targetGrams');
         const targetRatio = document.getElementById('targetRatio');
         const perMeal = document.getElementById('perMeal');
 
-        if (targetGrams) targetGrams.innerText = totalGrams + 'g';
+        const targetCalories = document.getElementById('targetCalories');
+        const targetCarbs = document.getElementById('targetCarbs');
+        const targetFats = document.getElementById('targetFats');
+        const targetWater = document.getElementById('targetWater');
+
+        if (targetGrams) targetGrams.innerText = totalProteinGrams + 'g';
         if (targetRatio) targetRatio.innerText = multiplier.toFixed(2) + ' g/lb';
         if (perMeal) perMeal.innerText = perMealGrams + 'g';
+
+        if (targetCalories) targetCalories.innerText = totalCalories.toLocaleString() + ' kcal';
+        if (targetCarbs) targetCarbs.innerText = carbGrams + 'g';
+        if (targetFats) targetFats.innerText = fatGrams + 'g';
+        if (targetWater) targetWater.innerText = hydrationOz + ' oz';
     }
 
     function addWeightLog() {
@@ -782,12 +911,26 @@
 
         if (!dateVal || isNaN(weightVal)) return;
 
-        weightLogs.push({ date: dateVal, weight: weightVal });
+        const existingIndex = weightLogs.findIndex(item => item.date === dateVal);
+        if (existingIndex !== -1) {
+            weightLogs[existingIndex].weight = weightVal;
+        } else {
+            weightLogs.push({ date: dateVal, weight: weightVal });
+        }
+
         weightLogs.sort((a, b) => new Date(a.date) - new Date(b.date));
 
         saveTrackerData();
         renderWeightLogs();
         weightInput.value = '';
+    }
+
+    function deleteWeightLog(index) {
+        if (index >= 0 && index < weightLogs.length) {
+            weightLogs.splice(index, 1);
+            saveTrackerData();
+            renderWeightLogs();
+        }
     }
 
     function renderWeightLogs() {
@@ -821,6 +964,7 @@
                 <td>${current.weight} lbs</td>
                 <td>${diffStr}</td>
                 <td>${badgeHtml}</td>
+                <td style="text-align: center;"><button class="btn-delete" title="Delete entry" onclick="deleteWeightLog(${i})">&times;</button></td>
             `;
             tbody.appendChild(tr);
         }
@@ -828,17 +972,41 @@
         updateRecommendations();
     }
 
+    function exportWeightLogsCSV() {
+        if (!weightLogs.length) {
+            alert('No weight logs available to export.');
+            return;
+        }
+
+        let csvContent = 'data:text/csv;charset=utf-8,Date,Weight (lbs)\n';
+        weightLogs.forEach(row => {
+            csvContent += `${row.date},${row.weight}\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `weight_history_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     function updateRecommendations() {
-        if (weightLogs.length < 2) return;
-
-        const first = weightLogs[0].weight;
-        const latest = weightLogs[weightLogs.length - 1].weight;
-        const totalDiff = latest - first;
-
         const titleElem = document.getElementById('recTitle');
         const textElem = document.getElementById('recText');
 
         if (!titleElem || !textElem) return;
+
+        if (weightLogs.length < 2) {
+            titleElem.innerText = "Evaluation Processing...";
+            textElem.innerText = "Log multiple entries to view guidance updates.";
+            return;
+        }
+
+        const first = weightLogs[0].weight;
+        const latest = weightLogs[weightLogs.length - 1].weight;
+        const totalDiff = latest - first;
 
         if (totalDiff < 0) {
             titleElem.innerText = "Target Trajectory Reached";
@@ -881,6 +1049,8 @@
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
+        let monthCompletedCount = 0;
+
         for (let i = 0; i < firstDay; i++) {
             const emptyCell = document.createElement('div');
             emptyCell.className = 'calendar-day empty';
@@ -901,6 +1071,7 @@
 
             if (completedDays.has(dateKey)) {
                 cell.classList.add('completed');
+                monthCompletedCount++;
             }
 
             cell.innerHTML = `<span class="day-number">${day}</span>`;
@@ -910,6 +1081,21 @@
 
             grid.appendChild(cell);
         }
+
+        updateAdherenceScore(monthCompletedCount, daysInMonth);
+    }
+
+    function updateAdherenceScore(completedCount, totalDays) {
+        const percentElem = document.getElementById('adherencePercent');
+        const fillElem = document.getElementById('adherenceFill');
+        const statsElem = document.getElementById('adherenceStats');
+
+        if (!percentElem || !fillElem || !statsElem) return;
+
+        const percentage = totalDays > 0 ? Math.round((completedCount / totalDays) * 100) : 0;
+        percentElem.innerText = `${percentage}%`;
+        fillElem.style.width = `${percentage}%`;
+        statsElem.innerText = `${completedCount} of ${totalDays} days completed this month`;
     }
 
     function toggleDayCompletion(dateKey) {
