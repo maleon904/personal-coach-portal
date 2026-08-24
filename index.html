@@ -328,13 +328,13 @@
         if (isLoggingOut) {
             auth.signOut().then(() => {
                 revealUI();
-                // Clean URL
+                // Clean URL query parameters
                 window.history.replaceState({}, document.title, window.location.pathname);
-            });
+            }).catch(() => revealUI());
         } else {
             auth.onAuthStateChanged((user) => {
                 if (user && window.location.protocol !== 'file:') {
-                    window.location.href = 'Form.html';
+                    window.location.replace('Form.html');
                 } else {
                     revealUI();
                 }
@@ -430,7 +430,7 @@
                     email: email,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                window.location.href = 'Form.html';
+                window.location.replace('Form.html');
             } catch (error) {
                 showAlert(error.message);
                 resetSubmitBtn();
@@ -438,7 +438,7 @@
         } else {
             try {
                 await auth.signInWithEmailAndPassword(email, password);
-                window.location.href = 'Form.html';
+                window.location.replace('Form.html');
             } catch (error) {
                 showAlert('Failed to sign in: ' + error.message);
                 resetSubmitBtn();
