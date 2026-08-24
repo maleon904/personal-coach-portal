@@ -71,6 +71,24 @@
             color: var(--primary-navy);
         }
 
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lang-select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-navy);
+            cursor: pointer;
+            outline: none;
+        }
+
         .btn-logout {
             background: none;
             border: 1px solid var(--border-color);
@@ -442,75 +460,81 @@
 <header>
     <div class="header-brand">
         <img src="Logo1.JPG" alt="Logo" class="header-logo">
-        <span class="header-title">Client Dashboard</span>
+        <span class="header-title" data-i18n="headerTitle">Client Dashboard</span>
     </div>
-    <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+    <div class="header-controls">
+        <select id="langSelect" class="lang-select" onchange="switchLanguage(this.value)">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+        </select>
+        <button class="btn-logout" onclick="handleLogout()" data-i18n="signOut">Sign Out</button>
+    </div>
 </header>
 
 <main class="main-container">
     <!-- Profile & Information -->
     <section class="card">
-        <div class="card-title">Personal Profile</div>
+        <div class="card-title" data-i18n="personalProfile">Personal Profile</div>
         <div class="profile-upload-container">
             <div class="avatar-preview" onclick="document.getElementById('profileUpload').click()">
                 <img id="profileImg" alt="Profile">
-                <span class="upload-text" id="uploadText">Upload Photo</span>
+                <span class="upload-text" id="uploadText" data-i18n="uploadPhoto">Upload Photo</span>
             </div>
             <input type="file" id="profileUpload" accept="image/*" style="display: none;" onchange="previewImage(event)">
             <div>
-                <p style="font-size: 14px; font-weight: 600;">Client Details</p>
-                <p style="font-size: 12px; color: var(--text-muted);">Update your information to recalibrate metrics</p>
+                <p style="font-size: 14px; font-weight: 600;" data-i18n="clientDetails">Client Details</p>
+                <p style="font-size: 12px; color: var(--text-muted);" data-i18n="updateInfoSub">Update your information to recalibrate metrics</p>
             </div>
         </div>
 
         <div class="grid-2">
             <div class="form-group">
-                <label for="fullName">Full Name</label>
+                <label for="fullName" data-i18n="labelFullName">Full Name</label>
                 <input type="text" id="fullName" placeholder="Name">
             </div>
             <div class="form-group">
-                <label for="age">Age</label>
+                <label for="age" data-i18n="labelAge">Age</label>
                 <input type="number" id="age" placeholder="Age">
             </div>
         </div>
 
         <div class="grid-3">
             <div class="form-group">
-                <label for="heightFeet">Height (Feet)</label>
+                <label for="heightFeet" data-i18n="labelHeightFeet">Height (Feet)</label>
                 <input type="number" id="heightFeet" placeholder="5">
             </div>
             <div class="form-group">
-                <label for="heightInches">Height (Inches)</label>
+                <label for="heightInches" data-i18n="labelHeightInches">Height (Inches)</label>
                 <input type="number" id="heightInches" placeholder="10">
             </div>
             <div class="form-group">
-                <label for="weight">Weight (lbs)</label>
+                <label for="weight" data-i18n="labelWeight">Weight (lbs)</label>
                 <input type="number" id="weight" placeholder="190" oninput="updateProfileWeight(this.value)">
             </div>
         </div>
 
         <div class="grid-3">
             <div class="form-group">
-                <label for="bodyType">Body Type</label>
+                <label for="bodyType" data-i18n="labelBodyType">Body Type</label>
                 <select id="bodyType">
-                    <option value="ectomorph">Ectomorph</option>
-                    <option value="mesomorph">Mesomorph</option>
-                    <option value="endomorph" selected>Endomorph</option>
+                    <option value="ectomorph" data-i18n="optEctomorph">Ectomorph</option>
+                    <option value="mesomorph" data-i18n="optMesomorph">Mesomorph</option>
+                    <option value="endomorph" selected data-i18n="optEndomorph">Endomorph</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="fitnessGoal">Primary Goal</label>
+                <label for="fitnessGoal" data-i18n="labelFitnessGoal">Primary Goal</label>
                 <select id="fitnessGoal" onchange="calculateProtein()">
-                    <option value="fat_loss" selected>Fat Loss</option>
-                    <option value="hypertrophy">Muscle Gain</option>
-                    <option value="maintenance">Maintenance</option>
+                    <option value="fat_loss" selected data-i18n="optFatLoss">Fat Loss</option>
+                    <option value="hypertrophy" data-i18n="optMuscleGain">Muscle Gain</option>
+                    <option value="maintenance" data-i18n="optMaintenance">Maintenance</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="activityLevel">Activity Level</label>
+                <label for="activityLevel" data-i18n="labelActivityLevel">Activity Level</label>
                 <select id="activityLevel" onchange="calculateProtein()">
-                    <option value="moderate" selected>Moderate Exercise</option>
-                    <option value="heavy">Heavy Resistance</option>
+                    <option value="moderate" selected data-i18n="optModExercise">Moderate Exercise</option>
+                    <option value="heavy" data-i18n="optHeavyResistance">Heavy Resistance</option>
                 </select>
             </div>
         </div>
@@ -518,53 +542,53 @@
 
     <!-- Daily Targets -->
     <section class="card">
-        <div class="card-title">Nutrition Calibration</div>
+        <div class="card-title" data-i18n="nutritionCalibration">Nutrition Calibration</div>
 
         <!-- Instructional Callout Box -->
         <div class="info-notice-box">
-            <span>💡 <strong>Tip:</strong> Click any metric box or the <strong>"💡 Explain"</strong> button below to open an explanation modal breaking down what that macro is and why it matters.</span>
+            <span data-i18n="tipNotice">💡 <strong>Tip:</strong> Click any metric box or the <strong>"💡 Explain"</strong> button below to open an explanation modal breaking down what that macro is and why it matters.</span>
         </div>
 
         <div class="grid-3" style="margin-bottom: 16px;">
             <div class="stat-box clickable" onclick="explainMacro('protein')">
                 <div class="stat-value" id="targetGrams">0g</div>
-                <div class="stat-label">Target Protein</div>
-                <button class="btn-explain" type="button">💡 Explain</button>
+                <div class="stat-label" data-i18n="targetProtein">Target Protein</div>
+                <button class="btn-explain" type="button" data-i18n="btnExplain">💡 Explain</button>
             </div>
             <div class="stat-box clickable" onclick="explainMacro('ratio')">
                 <div class="stat-value" id="targetRatio">0.0 g/lb</div>
-                <div class="stat-label">Ratio Rate</div>
-                <button class="btn-explain" type="button">💡 Explain</button>
+                <div class="stat-label" data-i18n="ratioRate">Ratio Rate</div>
+                <button class="btn-explain" type="button" data-i18n="btnExplain">💡 Explain</button>
             </div>
             <div class="stat-box clickable" onclick="explainMacro('perMeal')">
                 <div class="stat-value" id="perMeal">0g</div>
-                <div class="stat-label">Per Meal Target (4x)</div>
-                <button class="btn-explain" type="button">💡 Explain</button>
+                <div class="stat-label" data-i18n="perMealTarget">Per Meal Target (4x)</div>
+                <button class="btn-explain" type="button" data-i18n="btnExplain">💡 Explain</button>
             </div>
         </div>
 
         <!-- Full Macronutrient Distribution Breakdown -->
-        <div class="card-title" style="font-size: 15px; margin-bottom: 12px;">Full Macronutrient Plan Target</div>
+        <div class="card-title" style="font-size: 15px; margin-bottom: 12px;" data-i18n="fullMacroPlan">Full Macronutrient Plan Target</div>
         <div class="grid-4">
             <div class="stat-box clickable" onclick="explainMacro('calories')">
                 <div class="stat-value" id="targetCalories" style="color: var(--primary-navy);">0 kcal</div>
-                <div class="stat-label">Daily Calories</div>
-                <button class="btn-explain" type="button">💡 Explain</button>
+                <div class="stat-label" data-i18n="dailyCalories">Daily Calories</div>
+                <button class="btn-explain" type="button" data-i18n="btnExplain">💡 Explain</button>
             </div>
             <div class="stat-box clickable" onclick="explainMacro('carbs')">
                 <div class="stat-value" id="targetCarbs" style="color: #0284c7;">0g</div>
-                <div class="stat-label">Carbohydrates</div>
-                <button class="btn-explain" type="button">💡 Explain</button>
+                <div class="stat-label" data-i18n="carbohydrates">Carbohydrates</div>
+                <button class="btn-explain" type="button" data-i18n="btnExplain">💡 Explain</button>
             </div>
             <div class="stat-box clickable" onclick="explainMacro('fats')">
                 <div class="stat-value" id="targetFats" style="color: #d97706;">0g</div>
-                <div class="stat-label">Dietary Fats</div>
-                <button class="btn-explain" type="button">💡 Explain</button>
+                <div class="stat-label" data-i18n="dietaryFats">Dietary Fats</div>
+                <button class="btn-explain" type="button" data-i18n="btnExplain">💡 Explain</button>
             </div>
             <div class="stat-box clickable" onclick="explainMacro('water')">
                 <div class="stat-value" id="targetWater" style="color: var(--accent-blue);">0 oz</div>
-                <div class="stat-label">Hydration Target</div>
-                <button class="btn-explain" type="button">💡 Explain</button>
+                <div class="stat-label" data-i18n="hydrationTarget">Hydration Target</div>
+                <button class="btn-explain" type="button" data-i18n="btnExplain">💡 Explain</button>
             </div>
         </div>
     </section>
@@ -574,27 +598,27 @@
         <!-- Weight Logs -->
         <section class="card">
             <div class="card-title">
-                <span>Weight Log History</span>
-                <button class="btn-secondary" onclick="exportWeightLogsCSV()">Export CSV</button>
+                <span data-i18n="weightLogHistory">Weight Log History</span>
+                <button class="btn-secondary" onclick="exportWeightLogsCSV()" data-i18n="exportCSV">Export CSV</button>
             </div>
             <div class="form-group">
-                <label for="logDate">Date</label>
+                <label for="logDate" data-i18n="labelDate">Date</label>
                 <input type="date" id="logDate">
             </div>
             <div class="form-group">
-                <label for="logWeight">Weight (lbs)</label>
+                <label for="logWeight" data-i18n="labelWeightEntry">Weight (lbs)</label>
                 <input type="number" id="logWeight" placeholder="190">
             </div>
-            <button class="btn-primary" style="width: 100%; margin-bottom: 16px;" onclick="addWeightLog()">Log Weight Entry</button>
+            <button class="btn-primary" style="width: 100%; margin-bottom: 16px;" onclick="addWeightLog()" data-i18n="btnLogWeight">Log Weight Entry</button>
 
             <table>
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Weight</th>
-                        <th>Diff</th>
-                        <th>Status</th>
-                        <th style="text-align: center;">Action</th>
+                        <th data-i18n="thDate">Date</th>
+                        <th data-i18n="thWeight">Weight</th>
+                        <th data-i18n="thDiff">Diff</th>
+                        <th data-i18n="thStatus">Status</th>
+                        <th style="text-align: center;" data-i18n="thAction">Action</th>
                     </tr>
                 </thead>
                 <tbody id="weightHistoryBody"></tbody>
@@ -617,7 +641,7 @@
 
             <div class="adherence-container">
                 <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
-                    <span>Monthly Adherence Score</span>
+                    <span data-i18n="adherenceScore">Monthly Adherence Score</span>
                     <span id="adherencePercent" style="color: var(--success-green);">0%</span>
                 </div>
                 <div class="progress-bar-bg">
@@ -630,27 +654,27 @@
 
     <!-- Communication Preferences -->
     <section class="card">
-        <div class="card-title">Dispatch Preferences</div>
+        <div class="card-title" data-i18n="dispatchPreferences">Dispatch Preferences</div>
         <form onsubmit="saveNotificationPrefs(event)">
             <div class="grid-3">
                 <div class="form-group">
-                    <label for="userEmail">Email Address</label>
+                    <label for="userEmail" data-i18n="labelEmail">Email Address</label>
                     <input type="email" id="userEmail" placeholder="email@example.com">
                 </div>
                 <div class="form-group">
-                    <label for="userPhone">Phone Number</label>
+                    <label for="userPhone" data-i18n="labelPhone">Phone Number</label>
                     <input type="tel" id="userPhone" placeholder="(555) 000-0000">
                 </div>
                 <div class="form-group">
-                    <label for="prefChannel">Preferred Channel</label>
+                    <label for="prefChannel" data-i18n="labelPrefChannel">Preferred Channel</label>
                     <select id="prefChannel">
-                        <option value="email">Email Summary</option>
-                        <option value="sms">SMS Digest</option>
+                        <option value="email" data-i18n="optEmailSummary">Email Summary</option>
+                        <option value="sms" data-i18n="optSmsDigest">SMS Digest</option>
                     </select>
                 </div>
             </div>
-            <button type="submit" class="btn-primary" style="margin-top: 8px;">Save Settings</button>
-            <div id="subSuccessMsg" style="display: none; color: var(--success-green); font-size: 12px; margin-top: 8px; font-weight: 600;">Preferences updated!</div>
+            <button type="submit" class="btn-primary" style="margin-top: 8px;" data-i18n="btnSaveSettings">Save Settings</button>
+            <div id="subSuccessMsg" style="display: none; color: var(--success-green); font-size: 12px; margin-top: 8px; font-weight: 600;" data-i18n="prefsUpdated">Preferences updated!</div>
         </form>
     </section>
 </main>
@@ -660,11 +684,168 @@
     <div class="modal-card">
         <h3 id="modalTitle" style="font-size: 16px; margin-bottom: 12px; color: var(--primary-navy);">Notification Setup</h3>
         <p id="modalMessageBody" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;"></p>
-        <button class="btn-primary" style="width: 100%;" onclick="closeModal()">Close Explanation</button>
+        <button class="btn-primary" style="width: 100%;" onclick="closeModal()" data-i18n="btnCloseModal">Close Explanation</button>
     </div>
 </div>
 
 <script>
+    // --- TRANSLATIONS DICTIONARY ---
+    const translations = {
+        en: {
+            headerTitle: "Client Dashboard",
+            signOut: "Sign Out",
+            personalProfile: "Personal Profile",
+            uploadPhoto: "Upload Photo",
+            clientDetails: "Client Details",
+            updateInfoSub: "Update your information to recalibrate metrics",
+            labelFullName: "Full Name",
+            labelAge: "Age",
+            labelHeightFeet: "Height (Feet)",
+            labelHeightInches: "Height (Inches)",
+            labelWeight: "Weight (lbs)",
+            labelBodyType: "Body Type",
+            optEctomorph: "Ectomorph",
+            optMesomorph: "Mesomorph",
+            optEndomorph: "Endomorph",
+            labelFitnessGoal: "Primary Goal",
+            optFatLoss: "Fat Loss",
+            optMuscleGain: "Muscle Gain",
+            optMaintenance: "Maintenance",
+            labelActivityLevel: "Activity Level",
+            optModExercise: "Moderate Exercise",
+            optHeavyResistance: "Heavy Resistance",
+            nutritionCalibration: "Nutrition Calibration",
+            tipNotice: "💡 <strong>Tip:</strong> Click any metric box or the <strong>\"💡 Explain\"</strong> button below to open an explanation modal breaking down what that macro is and why it matters.",
+            targetProtein: "Target Protein",
+            ratioRate: "Ratio Rate",
+            perMealTarget: "Per Meal Target (4x)",
+            btnExplain: "💡 Explain",
+            fullMacroPlan: "Full Macronutrient Plan Target",
+            dailyCalories: "Daily Calories",
+            carbohydrates: "Carbohydrates",
+            dietaryFats: "Dietary Fats",
+            hydrationTarget: "Hydration Target",
+            weightLogHistory: "Weight Log History",
+            exportCSV: "Export CSV",
+            labelDate: "Date",
+            labelWeightEntry: "Weight (lbs)",
+            btnLogWeight: "Log Weight Entry",
+            thDate: "Date",
+            thWeight: "Weight",
+            thDiff: "Diff",
+            thStatus: "Status",
+            thAction: "Action",
+            adherenceScore: "Monthly Adherence Score",
+            daysCompleted: "days completed this month",
+            dispatchPreferences: "Dispatch Preferences",
+            labelEmail: "Email Address",
+            labelPhone: "Phone Number",
+            labelPrefChannel: "Preferred Channel",
+            optEmailSummary: "Email Summary",
+            optSmsDigest: "SMS Digest",
+            btnSaveSettings: "Save Settings",
+            prefsUpdated: "Preferences updated!",
+            btnCloseModal: "Close Explanation",
+            badgeBaseline: "Baseline",
+            badgeOnTrack: "On Track",
+            badgeSurplus: "Surplus",
+            badgeMaintained: "Maintained",
+            recProcessingTitle: "Evaluation Processing...",
+            recProcessingText: "Log multiple entries to view guidance updates.",
+            recTargetTitle: "Target Trajectory Reached",
+            recTargetText: "You have lost {diff} lbs over recent logs. Maintain current daily protein and macronutrient levels to preserve muscle mass.",
+            recCalorieTitle: "Caloric Adjustment Recommended",
+            recCalorieText: "Weight increased by {diff} lbs. Consider increasing daily protein intake slightly and auditing non-essential daily calories.",
+            recStableTitle: "Stable Weight Maintenance",
+            recStableText: "Your body weight remains steady. Continue current workout schedule and nutritional plan."
+        },
+        es: {
+            headerTitle: "Panel del Cliente",
+            signOut: "Cerrar Sesión",
+            personalProfile: "Perfil Personal",
+            uploadPhoto: "Subir Foto",
+            clientDetails: "Detalles del Cliente",
+            updateInfoSub: "Actualice su información para recalibrar sus métricas",
+            labelFullName: "Nombre Completo",
+            labelAge: "Edad",
+            labelHeightFeet: "Estatura (Pies)",
+            labelHeightInches: "Estatura (Pulgadas)",
+            labelWeight: "Peso (lbs)",
+            labelBodyType: "Tipo de Cuerpo",
+            optEctomorph: "Ectomorfo",
+            optMesomorph: "Mesomorfo",
+            optEndomorph: "Endomorfo",
+            labelFitnessGoal: "Objetivo Principal",
+            optFatLoss: "Pérdida de Grasa",
+            optMuscleGain: "Ganancia Muscular",
+            optMaintenance: "Mantenimiento",
+            labelActivityLevel: "Nivel de Actividad",
+            optModExercise: "Ejercicio Moderado",
+            optHeavyResistance: "Resistencia Pesada",
+            nutritionCalibration: "Calibración Nutricional",
+            tipNotice: "💡 <strong>Consejo:</strong> Haga clic en cualquier casilla o en el botón <strong>\"💡 Explicar\"</strong> para abrir una ventana explicativa detallada.",
+            targetProtein: "Proteína Objetivo",
+            ratioRate: "Tasa de Proporción",
+            perMealTarget: "Objetivo por Comida (4x)",
+            btnExplain: "💡 Explicar",
+            fullMacroPlan: "Plan Macro Objetivo Completo",
+            dailyCalories: "Calorías Diarias",
+            carbohydrates: "Carbohidratos",
+            dietaryFats: "Grasas Dietéticas",
+            hydrationTarget: "Meta de Hidratación",
+            weightLogHistory: "Historial de Registro de Peso",
+            exportCSV: "Exportar CSV",
+            labelDate: "Fecha",
+            labelWeightEntry: "Peso (lbs)",
+            btnLogWeight: "Registrar Entrada de Peso",
+            thDate: "Fecha",
+            thWeight: "Peso",
+            thDiff: "Diferencia",
+            thStatus: "Estado",
+            thAction: "Acción",
+            adherenceScore: "Puntaje de Cumplimiento Mensual",
+            daysCompleted: "días completados este mes",
+            dispatchPreferences: "Preferencias de Envío",
+            labelEmail: "Correo Electrónico",
+            labelPhone: "Número de Teléfono",
+            labelPrefChannel: "Canal Preferido",
+            optEmailSummary: "Resumen por Correo",
+            optSmsDigest: "Resumen por SMS",
+            btnSaveSettings: "Guardar Ajustes",
+            prefsUpdated: "¡Preferencias actualizadas!",
+            btnCloseModal: "Cerrar Explicación",
+            badgeBaseline: "Línea Base",
+            badgeOnTrack: "En Trayecto",
+            badgeSurplus: "Superávit",
+            badgeMaintained: "Mantenido",
+            recProcessingTitle: "Procesando Evaluación...",
+            recProcessingText: "Registre múltiples entradas para ver las recomendaciones.",
+            recTargetTitle: "Trayectoria Objetivo Alcanzada",
+            recTargetText: "Ha perdido {diff} lbs en registros recientes. Mantenga los niveles actuales para preservar la masa muscular.",
+            recCalorieTitle: "Ajuste Calórico Recomendado",
+            recCalorieText: "El peso aumentó en {diff} lbs. Considere aumentar la proteína diaria y revisar las calorías no esenciales.",
+            recStableTitle: "Mantenimiento de Peso Estable",
+            recStableText: "Su peso se mantiene constante. Continúe con su plan de entrenamiento y nutrición actual."
+        }
+    };
+
+    let currentLang = 'en';
+
+    function switchLanguage(lang) {
+        currentLang = lang;
+        const dict = translations[lang];
+
+        document.querySelectorAll('[data-i18n]').forEach(elem => {
+            const key = elem.getAttribute('data-i18n');
+            if (dict[key]) {
+                elem.innerHTML = dict[key];
+            }
+        });
+
+        renderWeightLogs();
+        renderCalendar();
+    }
+
     // --- FIREBASE AUTHENTICATION CONFIG ---
     const firebaseConfig = {
         apiKey: "AIzaSyCkD7jAuJSzk2aEYkZmbfED6y6SGSAghMg",
@@ -770,38 +951,28 @@
     let completedDays = new Set(['2026-08-01', '2026-08-02', '2026-08-03', '2026-08-05', '2026-08-08', '2026-08-10', '2026-08-11', '2026-08-12']);
 
     const macroExplanations = {
-        protein: {
-            title: "Target Protein",
-            text: "<strong>What it is:</strong> Protein is the primary building block of lean muscle tissue.<br><br><strong>Why it matters:</strong> Eating sufficient protein repairs muscle tissue after strength training and prevents muscle loss during fat-loss phases while increasing satiety."
+        en: {
+            protein: { title: "Target Protein", text: "<strong>What it is:</strong> Protein is the primary building block of lean muscle tissue.<br><br><strong>Why it matters:</strong> Eating sufficient protein repairs muscle tissue after strength training and prevents muscle loss during fat-loss phases while increasing satiety." },
+            ratio: { title: "Ratio Rate (g/lb)", text: "<strong>What it is:</strong> The ratio of daily protein relative to your body weight in pounds.<br><br><strong>Why it matters:</strong> A higher ratio (e.g., 1.0–1.1 g/lb) preserves lean body mass when in a calorie deficit or performing intense workouts." },
+            perMeal: { title: "Per Meal Target (4x)", text: "<strong>What it is:</strong> Your total protein target divided evenly across 4 daily meals.<br><br><strong>Why it matters:</strong> Spacing protein throughout the day keeps muscle protein synthesis active and optimizes amino acid absorption." },
+            calories: { title: "Daily Calories", text: "<strong>What it is:</strong> The total energy target your body needs per day.<br><br><strong>Why it matters:</strong> Energy balance dictates weight loss or gain. Keeping calories at this calibrated target produces steady fat loss without stalling your metabolic rate." },
+            carbs: { title: "Carbohydrates", text: "<strong>What it is:</strong> The body’s primary and preferred energy source.<br><br><strong>Why it matters:</strong> Carbohydrates power high-intensity workouts and replenish muscle glycogen so strength levels remain high." },
+            fats: { title: "Dietary Fats", text: "<strong>What it is:</strong> Essential fatty acids necessary for cell integrity and health.<br><br><strong>Why it matters:</strong> Adequate fats support joint health, hormone production (such as testosterone and thyroid signals), and vitamin absorption." },
+            water: { title: "Hydration Target", text: "<strong>What it is:</strong> Daily minimum fluid intake tailored to your weight.<br><br><strong>Why it matters:</strong> Proper hydration drives nutrient transport into cells, reduces fatigue, and aids digestive health." }
         },
-        ratio: {
-            title: "Ratio Rate (g/lb)",
-            text: "<strong>What it is:</strong> The ratio of daily protein relative to your body weight in pounds.<br><br><strong>Why it matters:</strong> A higher ratio (e.g., 1.0–1.1 g/lb) preserves lean body mass when in a calorie deficit or performing intense workouts."
-        },
-        perMeal: {
-            title: "Per Meal Target (4x)",
-            text: "<strong>What it is:</strong> Your total protein target divided evenly across 4 daily meals.<br><br><strong>Why it matters:</strong> Spacing protein throughout the day keeps muscle protein synthesis active and optimizes amino acid absorption."
-        },
-        calories: {
-            title: "Daily Calories",
-            text: "<strong>What it is:</strong> The total energy target your body needs per day.<br><br><strong>Why it matters:</strong> Energy balance dictates weight loss or gain. Keeping calories at this calibrated target produces steady fat loss without stalling your metabolic rate."
-        },
-        carbs: {
-            title: "Carbohydrates",
-            text: "<strong>What it is:</strong> The body’s primary and preferred energy source.<br><br><strong>Why it matters:</strong> Carbohydrates power high-intensity workouts and replenish muscle glycogen so strength levels remain high."
-        },
-        fats: {
-            title: "Dietary Fats",
-            text: "<strong>What it is:</strong> Essential fatty acids necessary for cell integrity and health.<br><br><strong>Why it matters:</strong> Adequate fats support joint health, hormone production (such as testosterone and thyroid signals), and vitamin absorption."
-        },
-        water: {
-            title: "Hydration Target",
-            text: "<strong>What it is:</strong> Daily minimum fluid intake tailored to your weight.<br><br><strong>Why it matters:</strong> Proper hydration drives nutrient transport into cells, reduces fatigue, and aids digestive health."
+        es: {
+            protein: { title: "Proteína Objetivo", text: "<strong>Qué es:</strong> La proteína es el bloque de construcción principal del tejido muscular magro.<br><br><strong>Por qué importa:</strong> Consumir suficiente proteína repara el tejido muscular tras el entrenamiento de fuerza y evita la pérdida muscular durante fases de pérdida de grasa." },
+            ratio: { title: "Tasa de Proporción (g/lb)", text: "<strong>Qué es:</strong> La proporción de proteína diaria en relación con su peso corporal en libras.<br><br><strong>Por qué importa:</strong> Una tasa más alta (ej. 1.0–1.1 g/lb) preserva la masa magra cuando hay un déficit calórico." },
+            perMeal: { title: "Objetivo por Comida (4x)", text: "<strong>Qué es:</strong> Su objetivo total de proteína dividido en 4 comidas diarias.<br><br><strong>Por qué importa:</strong> Espaciar la proteína mantiene activa la síntesis de proteína muscular y optimiza la absorción de aminoácidos." },
+            calories: { title: "Calorías Diarias", text: "<strong>Qué es:</strong> El objetivo de energía total que su cuerpo requiere al día.<br><br><strong>Por qué importa:</strong> El balance energético dicta la pérdida o ganancia de peso para asegurar una pérdida de grasa constante sin ralentizar el metabolismo." },
+            carbs: { title: "Carbohidratos", text: "<strong>Qué es:</strong> La fuente de energía principal y preferida del cuerpo.<br><br><strong>Por qué importa:</strong> Impulsan los entrenamientos de alta intensidad y reponen el glucógeno muscular para mantener niveles altos de fuerza." },
+            fats: { title: "Grasas Dietéticas", text: "<strong>Qué es:</strong> Ácidos grasos esenciales necesarios para la integridad celular.<br><br><strong>Por qué importa:</strong> Favorecen la salud articular, la producción hormonal y la absorción de vitaminas." },
+            water: { title: "Meta de Hidratación", text: "<strong>Qué es:</strong> Consumo diario mínimo de líquidos adaptado a su peso.<br><br><strong>Por qué importa:</strong> La hidratación adecuada transporta nutrientes a las células, reduce la fatiga y ayuda a la digestión." }
         }
     };
 
     function explainMacro(key) {
-        const info = macroExplanations[key];
+        const info = macroExplanations[currentLang][key];
         if (!info) return;
 
         const title = document.getElementById('modalTitle');
@@ -1039,24 +1210,25 @@
         const tbody = document.getElementById('weightHistoryBody');
         if (!tbody) return;
         tbody.innerHTML = '';
+        const dict = translations[currentLang];
 
         for (let i = 0; i < weightLogs.length; i++) {
             const current = weightLogs[i];
             let diffStr = 'N/A';
-            let badgeHtml = '<span class="status-badge badge-blue">Baseline</span>';
+            let badgeHtml = `<span class="status-badge badge-blue">${dict.badgeBaseline}</span>`;
 
             if (i > 0) {
                 const prev = weightLogs[i - 1];
                 const diff = (current.weight - prev.weight).toFixed(1);
                 if (diff < 0) {
                     diffStr = diff + ' lbs';
-                    badgeHtml = '<span class="status-badge badge-green">On Track</span>';
+                    badgeHtml = `<span class="status-badge badge-green">${dict.badgeOnTrack}</span>`;
                 } else if (diff > 0) {
                     diffStr = '+' + diff + ' lbs';
-                    badgeHtml = '<span class="status-badge badge-orange">Surplus</span>';
+                    badgeHtml = `<span class="status-badge badge-orange">${dict.badgeSurplus}</span>`;
                 } else {
                     diffStr = '0.0 lbs';
-                    badgeHtml = '<span class="status-badge badge-blue">Maintained</span>';
+                    badgeHtml = `<span class="status-badge badge-blue">${dict.badgeMaintained}</span>`;
                 }
             }
 
@@ -1076,7 +1248,7 @@
 
     function exportWeightLogsCSV() {
         if (!weightLogs.length) {
-            alert('No weight logs available to export.');
+            alert(currentLang === 'es' ? 'No hay registros de peso para exportar.' : 'No weight logs available to export.');
             return;
         }
 
@@ -1097,12 +1269,13 @@
     function updateRecommendations() {
         const titleElem = document.getElementById('recTitle');
         const textElem = document.getElementById('recText');
+        const dict = translations[currentLang];
 
         if (!titleElem || !textElem) return;
 
         if (weightLogs.length < 2) {
-            titleElem.innerText = "Evaluation Processing...";
-            textElem.innerText = "Log multiple entries to view guidance updates.";
+            titleElem.innerText = dict.recProcessingTitle;
+            textElem.innerText = dict.recProcessingText;
             return;
         }
 
@@ -1111,14 +1284,14 @@
         const totalDiff = latest - first;
 
         if (totalDiff < 0) {
-            titleElem.innerText = "Target Trajectory Reached";
-            textElem.innerText = `You have lost ${Math.abs(totalDiff).toFixed(1)} lbs over recent logs. Maintain current daily protein and macronutrient levels to preserve muscle mass.`;
+            titleElem.innerText = dict.recTargetTitle;
+            textElem.innerText = dict.recTargetText.replace('{diff}', Math.abs(totalDiff).toFixed(1));
         } else if (totalDiff > 0) {
-            titleElem.innerText = "Caloric Adjustment Recommended";
-            textElem.innerText = `Weight increased by ${totalDiff.toFixed(1)} lbs. Consider increasing daily protein intake slightly and auditing non-essential daily calories.`;
+            titleElem.innerText = dict.recCalorieTitle;
+            textElem.innerText = dict.recCalorieText.replace('{diff}', totalDiff.toFixed(1));
         } else {
-            titleElem.innerText = "Stable Weight Maintenance";
-            textElem.innerText = "Your body weight remains steady. Continue current workout schedule and nutritional plan.";
+            titleElem.innerText = dict.recStableTitle;
+            textElem.innerText = dict.recStableText;
         }
     }
 
@@ -1135,12 +1308,18 @@
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
 
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const monthNamesEn = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const monthNamesEs = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const monthNames = currentLang === 'es' ? monthNamesEs : monthNamesEn;
+
         monthElem.innerText = `${monthNames[month]} ${year}`;
 
         grid.innerHTML = '';
 
-        const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const dayHeadersEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const dayHeadersEs = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        const dayHeaders = currentLang === 'es' ? dayHeadersEs : dayHeadersEn;
+
         dayHeaders.forEach(day => {
             const div = document.createElement('div');
             div.className = 'day-header';
@@ -1197,7 +1376,7 @@
         const percentage = totalDays > 0 ? Math.round((completedCount / totalDays) * 100) : 0;
         percentElem.innerText = `${percentage}%`;
         fillElem.style.width = `${percentage}%`;
-        statsElem.innerText = `${completedCount} of ${totalDays} days completed this month`;
+        statsElem.innerText = `${completedCount} / ${totalDays} ${translations[currentLang].daysCompleted}`;
     }
 
     function toggleDayCompletion(dateKey) {
@@ -1221,9 +1400,11 @@
         const title = document.getElementById('modalTitle');
         const body = document.getElementById('modalMessageBody');
         
-        if (title) title.innerText = "Notification Setup";
+        if (title) title.innerText = currentLang === 'es' ? "Configuración de Notificaciones" : "Notification Setup";
         if (body) {
-            body.innerHTML = `<strong>Dispatch Channel:</strong> ${channel.toUpperCase()}<br><strong>Recipient Email:</strong> ${email}<br><strong>Recipient Phone:</strong> ${phone}<br><br>Monthly summary alerts and protein recalculations enabled successfully.`;
+            body.innerHTML = currentLang === 'es' 
+                ? `<strong>Canal de Envío:</strong> ${channel.toUpperCase()}<br><strong>Correo Destino:</strong> ${email}<br><strong>Teléfono Destino:</strong> ${phone}<br><br>Alertas de resumen mensual activadas correctamente.`
+                : `<strong>Dispatch Channel:</strong> ${channel.toUpperCase()}<br><strong>Recipient Email:</strong> ${email}<br><strong>Recipient Phone:</strong> ${phone}<br><br>Monthly summary alerts and protein recalculations enabled successfully.`;
         }
 
         const subMsg = document.getElementById('subSuccessMsg');
