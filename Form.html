@@ -1196,13 +1196,18 @@
         setTimeout(() => msg.style.display = 'none', 3000);
     }
 
-    function handleLogout() {
-        firebase.auth().signOut().then(() => {
-            alert('Signed out successfully.');
-        }).catch(() => {
-            alert('Signed out.');
-        });
-    }
+   function handleLogout() {
+    firebase.auth().signOut().then(() => {
+        // Clear stored session data
+        localStorage.clear();
+        
+        // Root-relative path for GitHub Pages
+        window.location.assign("./index.html");
+    }).catch((error) => {
+        console.error("Sign out error:", error);
+        window.location.assign("./index.html");
+    });
+}  
 
     // Initialization
     window.onload = function() {
