@@ -325,40 +325,24 @@
         const urlParams = new URLSearchParams(window.location.search);
         const isLoggingOut = urlParams.get('logout') === 'true';
 
-if (isLoggingOut) {
-        // Force sign out, clear the URL parameter, and show login UI
-        auth.signOut().then(() => {
-            window.history.replaceState({}, document.title, window.location.pathname);
-            revealUI();
-        }).catch((e) => {
-            console.error("Logout error:", e);
-            revealUI();
-        });
-    } else {
-        // Only attach listener if we are not processing a logout action
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        // User is logged in -> redirect to dashboard
-        window.location.href = "Form.html";
-    } else {
-        // No session found -> hide spinner and reveal login form
-        revealUI();
-    }
-});
-    }
-}
+        if (isLoggingOut) {
+            // Force sign out, clear the URL parameter, and show login UI
+            auth.signOut().then(() => {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                revealUI();
+            }).catch((e) => {
+                console.error("Logout error:", e);
+                revealUI();
+            });
         } else {
+            // Check auth state
             auth.onAuthStateChanged((user) => {
-                const loadingOverlay = document.getElementById('auth-loader');
-                const loginContainer = document.getElementById('authContainer');
-
-                if (user && window.location.protocol !== 'file:') {
-                    // User is signed in, send them to the form/dashboard
+                if (user) {
+                    // User is logged in -> redirect to dashboard
                     window.location.href = "Form.html";
                 } else {
-                    // No user is signed in — hide loading screen and show login form
-                    if (loadingOverlay) loadingOverlay.style.display = 'none';
-                    if (loginContainer) loginContainer.style.display = 'block';
+                    // No session found -> hide spinner and reveal login form
+                    revealUI();
                 }
             });
         }
