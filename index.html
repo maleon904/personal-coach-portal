@@ -325,19 +325,21 @@
         const urlParams = new URLSearchParams(window.location.search);
         const isLoggingOut = urlParams.get('logout') === 'true';
 
-        if (isLoggingOut) {
-            auth.signOut().then(() => {
-                revealUI();
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }).catch(() => revealUI());
-        } else {
-        // User is not logging out, so listen for existing auth state
+if (isLoggingOut) {
+        // Force sign out, clear the URL parameter, and show login UI
+        auth.signOut().then(() => {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            revealUI();
+        }).catch((e) => {
+            console.error("Logout error:", e);
+            revealUI();
+        });
+    } else {
+        // Only attach listener if we are not processing a logout action
         auth.onAuthStateChanged((user) => {
             if (user) {
-                // User is authenticated, send to dashboard
                 window.location.href = "Form.html";
             } else {
-                // No user logged in, reveal the login form
                 revealUI();
             }
         });
