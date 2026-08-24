@@ -210,11 +210,11 @@
             padding: 16px;
             text-align: center;
             transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+            position: relative;
         }
 
         .stat-box.clickable {
             cursor: pointer;
-            position: relative;
         }
 
         .stat-box.clickable:hover {
@@ -236,12 +236,40 @@
             margin-top: 4px;
         }
 
-        .click-hint {
-            font-size: 10px;
+        .btn-explain {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 8px;
+            padding: 4px 10px;
+            background: #eff6ff;
             color: var(--accent-blue);
+            border: 1px solid #bfdbfe;
+            border-radius: 20px;
+            font-size: 11px;
             font-weight: 600;
-            margin-top: 6px;
-            display: block;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-explain:hover {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border-color: var(--accent-blue);
+        }
+
+        .info-notice-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #0369a1;
         }
 
         table {
@@ -490,25 +518,28 @@
 
     <!-- Daily Targets -->
     <section class="card">
-        <div class="card-title">
-            <span>Nutrition Calibration</span>
-            <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">Click any macro card for details</span>
+        <div class="card-title">Nutrition Calibration</div>
+
+        <!-- Instructional Callout Box -->
+        <div class="info-notice-box">
+            <span>💡 <strong>Tip:</strong> Click any metric box or the <strong>"💡 Explain"</strong> button below to open an explanation modal breaking down what that macro is and why it matters.</span>
         </div>
+
         <div class="grid-3" style="margin-bottom: 16px;">
             <div class="stat-box clickable" onclick="explainMacro('protein')">
                 <div class="stat-value" id="targetGrams">0g</div>
                 <div class="stat-label">Target Protein</div>
-                <span class="click-hint">Click for info ➔</span>
+                <button class="btn-explain" type="button">💡 Explain</button>
             </div>
             <div class="stat-box clickable" onclick="explainMacro('ratio')">
                 <div class="stat-value" id="targetRatio">0.0 g/lb</div>
                 <div class="stat-label">Ratio Rate</div>
-                <span class="click-hint">Click for info ➔</span>
+                <button class="btn-explain" type="button">💡 Explain</button>
             </div>
             <div class="stat-box clickable" onclick="explainMacro('perMeal')">
                 <div class="stat-value" id="perMeal">0g</div>
                 <div class="stat-label">Per Meal Target (4x)</div>
-                <span class="click-hint">Click for info ➔</span>
+                <button class="btn-explain" type="button">💡 Explain</button>
             </div>
         </div>
 
@@ -518,22 +549,22 @@
             <div class="stat-box clickable" onclick="explainMacro('calories')">
                 <div class="stat-value" id="targetCalories" style="color: var(--primary-navy);">0 kcal</div>
                 <div class="stat-label">Daily Calories</div>
-                <span class="click-hint">Click for info ➔</span>
+                <button class="btn-explain" type="button">💡 Explain</button>
             </div>
             <div class="stat-box clickable" onclick="explainMacro('carbs')">
                 <div class="stat-value" id="targetCarbs" style="color: #0284c7;">0g</div>
                 <div class="stat-label">Carbohydrates</div>
-                <span class="click-hint">Click for info ➔</span>
+                <button class="btn-explain" type="button">💡 Explain</button>
             </div>
             <div class="stat-box clickable" onclick="explainMacro('fats')">
                 <div class="stat-value" id="targetFats" style="color: #d97706;">0g</div>
                 <div class="stat-label">Dietary Fats</div>
-                <span class="click-hint">Click for info ➔</span>
+                <button class="btn-explain" type="button">💡 Explain</button>
             </div>
             <div class="stat-box clickable" onclick="explainMacro('water')">
                 <div class="stat-value" id="targetWater" style="color: var(--accent-blue);">0 oz</div>
                 <div class="stat-label">Hydration Target</div>
-                <span class="click-hint">Click for info ➔</span>
+                <button class="btn-explain" type="button">💡 Explain</button>
             </div>
         </div>
     </section>
@@ -625,11 +656,11 @@
 </main>
 
 <!-- Modal -->
-<div id="devModal" class="modal-overlay">
+<div id="devModal" class="modal-overlay" onclick="if(event.target === this) closeModal()">
     <div class="modal-card">
-        <h3 id="modalTitle" style="font-size: 16px; margin-bottom: 8px; color: var(--primary-navy);">Notification Setup</h3>
-        <p id="modalMessageBody" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;"></p>
-        <button class="btn-primary" style="width: 100%;" onclick="closeModal()">Close</button>
+        <h3 id="modalTitle" style="font-size: 16px; margin-bottom: 12px; color: var(--primary-navy);">Notification Setup</h3>
+        <p id="modalMessageBody" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;"></p>
+        <button class="btn-primary" style="width: 100%;" onclick="closeModal()">Close Explanation</button>
     </div>
 </div>
 
@@ -653,7 +684,6 @@
         auth = firebase.auth();
         db = firebase.firestore();
 
-        // AUTHENTICATION GUARD
         auth.onAuthStateChanged((user) => {
             if (user) {
                 document.body.style.display = 'flex';
@@ -729,7 +759,6 @@
         window.location.replace('index.html');
     }
 
-    // --- APPLICATION STATE ---
     let weightLogs = [
         { date: '2026-06-12', weight: 196 },
         { date: '2026-07-12', weight: 193 },
@@ -740,35 +769,34 @@
     const todayDate = new Date(2026, 7, 12);
     let completedDays = new Set(['2026-08-01', '2026-08-02', '2026-08-03', '2026-08-05', '2026-08-08', '2026-08-10', '2026-08-11', '2026-08-12']);
 
-    // MACRONUTRIENT EXPLANATIONS DICTIONARY
     const macroExplanations = {
         protein: {
             title: "Target Protein",
-            text: "<strong>What it is:</strong> Protein is the primary building block of lean muscle body mass.<br><br><strong>Why it matters:</strong> Eating sufficient protein repairs muscle tissue after strength training and prevents muscle breakdown during fat-loss phases while keeping you full longer."
+            text: "<strong>What it is:</strong> Protein is the primary building block of lean muscle tissue.<br><br><strong>Why it matters:</strong> Eating sufficient protein repairs muscle tissue after strength training and prevents muscle loss during fat-loss phases while increasing satiety."
         },
         ratio: {
             title: "Ratio Rate (g/lb)",
-            text: "<strong>What it is:</strong> The ratio of daily protein relative to your body weight in pounds.<br><br><strong>Why it matters:</strong> A higher ratio (e.g., 1.0–1.1 g/lb) protects muscle when cutting calories or performing intense resistance exercises."
+            text: "<strong>What it is:</strong> The ratio of daily protein relative to your body weight in pounds.<br><br><strong>Why it matters:</strong> A higher ratio (e.g., 1.0–1.1 g/lb) preserves lean body mass when in a calorie deficit or performing intense workouts."
         },
         perMeal: {
             title: "Per Meal Target (4x)",
-            text: "<strong>What it is:</strong> Your total protein target divided evenly across 4 daily meals.<br><br><strong>Why it matters:</strong> Spacing protein throughout the day keeps muscle protein synthesis active and ensures optimal amino acid absorption."
+            text: "<strong>What it is:</strong> Your total protein target divided evenly across 4 daily meals.<br><br><strong>Why it matters:</strong> Spacing protein throughout the day keeps muscle protein synthesis active and optimizes amino acid absorption."
         },
         calories: {
             title: "Daily Calories",
-            text: "<strong>What it is:</strong> The total energy target your body burns and needs per day.<br><br><strong>Why it matters:</strong> Energy balance dictates weight loss or muscle gain. Keeping calories at this target creates an optimal energy baseline for fat loss without crashing your metabolic rate."
+            text: "<strong>What it is:</strong> The total energy target your body needs per day.<br><br><strong>Why it matters:</strong> Energy balance dictates weight loss or gain. Keeping calories at this calibrated target produces steady fat loss without stalling your metabolic rate."
         },
         carbs: {
             title: "Carbohydrates",
-            text: "<strong>What it is:</strong> The body’s primary and preferred energy source for fuel.<br><br><strong>Why it matters:</strong> Carbohydrates power high-intensity workouts and restore glycogen stores in muscles so you maintain strength during training."
+            text: "<strong>What it is:</strong> The body’s primary and preferred energy source.<br><br><strong>Why it matters:</strong> Carbohydrates power high-intensity workouts and replenish muscle glycogen so strength levels remain high."
         },
         fats: {
             title: "Dietary Fats",
-            text: "<strong>What it is:</strong> Essential fatty acids necessary for hormone regulation and brain cell integrity.<br><br><strong>Why it matters:</strong> Adequate fats support testosterone, thyroid activity, joint health, and overall metabolic function."
+            text: "<strong>What it is:</strong> Essential fatty acids necessary for cell integrity and health.<br><br><strong>Why it matters:</strong> Adequate fats support joint health, hormone production (such as testosterone and thyroid signals), and vitamin absorption."
         },
         water: {
             title: "Hydration Target",
-            text: "<strong>What it is:</strong> Daily minimum fluid target tailored to your current weight.<br><br><strong>Why it matters:</strong> Proper hydration drives nutrient transport into muscle tissue, prevents fatigue, and aids digestion."
+            text: "<strong>What it is:</strong> Daily minimum fluid intake tailored to your weight.<br><br><strong>Why it matters:</strong> Proper hydration drives nutrient transport into cells, reduces fatigue, and aids digestive health."
         }
     };
 
@@ -944,7 +972,6 @@
         const totalProteinGrams = Math.round(weight * multiplier);
         const perMealGrams = Math.round(totalProteinGrams / 4);
 
-        // Full Macronutrient Targets Calculation
         let calorieMultiplier = 13;
         if (goal === 'fat_loss') calorieMultiplier = 11.5;
         else if (goal === 'hypertrophy') calorieMultiplier = 15;
