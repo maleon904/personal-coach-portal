@@ -1214,5 +1214,18 @@
         renderCalendar();
     };
 </script>
+    function handleLogout() {
+    firebase.auth().signOut().then(() => {
+        // Clear local storage session data if needed
+        localStorage.removeItem('userProfile');
+        
+        // Redirect the user to the landing/login page
+        window.location.href = "index.html";
+    }).catch((error) => {
+        console.error("Sign out error:", error);
+        // Fallback redirect even if Firebase throws an error
+        window.location.href = "index.html";
+    });
+}
 </body>
 </html>
