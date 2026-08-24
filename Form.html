@@ -1148,7 +1148,17 @@
     }
 
     function handleLogout() {
-        firebase.auth().signOut().then(() => alert("Logged out successfully.")).catch(() => alert("Logged out locally."));
+    firebase.auth().signOut()
+        .then(() => {
+            // Redirects to your login page
+            window.location.href = "login.html"; // Change to your sign-in file name
+        })
+        .catch((error) => {
+            console.error("Sign-out error:", error);
+            // Fallback redirect if sign-out fails locally
+            window.location.href = "login.html";
+        });
+}
     }
 
     // Init & Auth Binding
