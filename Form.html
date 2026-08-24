@@ -715,15 +715,19 @@
 
     // 2. Auth State Observer
     firebase.auth().onAuthStateChanged(async (user) => {
-        if (user) {
-            currentUser = user;
-            console.log("Authenticated User UID:", user.uid);
+    if (user) {
+        currentUser = user;
+        try {
             await loadUserProfileFromFirestore(user.uid);
-        } else {
-            console.warn("User not authenticated. Redirecting...");
-            window.location.href = "index.html";
+        } catch (err) {
+            console.error("Error loading profile:", err);
+            // DO NOT redirect to index.html on data error!
         }
-    });
+    } else {
+        // Only redirect if there is NO authenticated session at all
+        window.location.href = "index.html";
+    }
+});
 
     // TRANSLATIONS DICTIONARY
     const translations = {
@@ -1248,14 +1252,39 @@
             window.location.href = "index.html";
         });
     }
-</script>
-    // Function to handle logging out
-function logoutUser() {
-    firebase.auth().signOut().then(() => {
-        window.location.href = "index.html?logout=true";
-    }).catch((error) => {
-        console.error("Error signing out:", error);
+<script>
+    // 1. Firebase configuration and initialization (auth, db variables)
+    // ...
+
+    // 2. PASTE THE FUNCTION HERE:
+    async function loadUserProfileFromFirestore(uid) {
+        try {
+            const docRef = db.collection('users').doc(uid);
+            const docSnap = await docRef.get();
+
+            if (docSnap.exists) {
+                const data = docSnap.data();
+                // Populate form fields if elements exist
+                if (document.getElementById('fullName')) document.getElementById('fullName').value = data.fullName || '';
+                if (document.getElementById('age')) document.getElementById('age').value = data.age || '';
+                if (document.getElementById('weight')) document.getElementById('weight').value = data.weight || '';
+            } else {
+                console.log("No profile document exists yet for user:", uid);
+            }
+        } catch (error) {
+            console.error("Firestore read error:", error);
+        }
+    }
+
+    // 3. Auth Listener that calls the function above:
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            await loadUserProfileFromFirestore(user.uid);
+        } else {
+            window.location.href = "index.html";
+        }
     });
-}
+    </script>
 </body>
 </html>
