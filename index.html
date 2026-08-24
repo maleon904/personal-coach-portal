@@ -389,6 +389,29 @@
         alertBox.style.display = 'block';
     }
 
+    // Explicit registration helper function
+    async function handleSignUp(email, password, fullName) {
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            // Create the user's document in Firestore using their UID
+            await db.collection('users').doc(user.uid).set({
+                uid: user.uid,
+                fullName: fullName,
+                email: email,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // Redirect to Form.html
+            window.location.href = "Form.html";
+        } catch (error) {
+            console.error("Sign up error:", error.message);
+            showAlert(error.message);
+            resetSubmitBtn();
+        }
+    }
+
     async function handleAuthSubmit(e) {
         e.preventDefault();
 
@@ -428,18 +451,7 @@
                 return; 
             }
 
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                await db.collection('users').doc(userCredential.user.uid).set({
-                    fullName: fullName,
-                    email: email,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                window.location.replace('Form.html');
-            } catch (error) {
-                showAlert(error.message);
-                resetSubmitBtn();
-            }
+            await handleSignUp(email, password, fullName);
         } else {
             try {
                 await auth.signInWithEmailAndPassword(email, password);
