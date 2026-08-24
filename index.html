@@ -291,7 +291,6 @@
         if (container) container.style.display = 'block';
     }
 
-    // Immediately reveal UI when running via file:// protocol
     document.addEventListener('DOMContentLoaded', () => {
         if (window.location.protocol === 'file:') {
             revealUI();
@@ -322,13 +321,25 @@
             console.warn("Local persistence unavailable on file protocol:", e);
         }
 
-        auth.onAuthStateChanged((user) => {
-            if (user && window.location.protocol !== 'file:') {
-                window.location.href = 'Form.html';
-            } else {
+        // Check if redirected from a logout action
+        const urlParams = new URLSearchParams(window.location.search);
+        const isLoggingOut = urlParams.get('logout') === 'true';
+
+        if (isLoggingOut) {
+            auth.signOut().then(() => {
                 revealUI();
-            }
-        });
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        } else {
+            auth.onAuthStateChanged((user) => {
+                if (user && window.location.protocol !== 'file:') {
+                    window.location.href = 'Form.html';
+                } else {
+                    revealUI();
+                }
+            });
+        }
     } else {
         revealUI();
     }
