@@ -1257,6 +1257,26 @@
         renderCalendar();
     });
 </script>
+document.addEventListener('DOMContentLoaded', () => {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            console.log("Logout button clicked...");
 
+            try {
+                if (typeof firebase !== 'undefined' && firebase.auth) {
+                    await firebase.auth().signOut();
+                }
+            } catch (err) {
+                console.error("SignOut Error:", err);
+            } finally {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.replace('index.html');
+            }
+        });
+    }
+});
 </body>
 </html>
