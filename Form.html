@@ -475,69 +475,72 @@
     <!-- Profile & Information -->
     <section class="card">
         <div class="card-title" data-i18n="personalProfile">Personal Profile</div>
-        <div class="profile-upload-container">
-            <div class="avatar-preview" onclick="document.getElementById('profileUpload').click()">
-                <img id="profileImg" alt="Profile">
-                <span class="upload-text" id="uploadText" data-i18n="uploadPhoto">Upload Photo</span>
+        <form id="profileForm" onsubmit="saveUserProfile(event)">
+            <div class="profile-upload-container">
+                <div class="avatar-preview" onclick="document.getElementById('profileUpload').click()">
+                    <img id="profileImg" alt="Profile">
+                    <span class="upload-text" id="uploadText" data-i18n="uploadPhoto">Upload Photo</span>
+                </div>
+                <input type="file" id="profileUpload" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                <div>
+                    <p style="font-size: 14px; font-weight: 600;" data-i18n="clientDetails">Client Details</p>
+                    <p style="font-size: 12px; color: var(--text-muted);" data-i18n="updateInfoSub">Update your information to recalibrate metrics</p>
+                </div>
             </div>
-            <input type="file" id="profileUpload" accept="image/*" style="display: none;" onchange="previewImage(event)">
-            <div>
-                <p style="font-size: 14px; font-weight: 600;" data-i18n="clientDetails">Client Details</p>
-                <p style="font-size: 12px; color: var(--text-muted);" data-i18n="updateInfoSub">Update your information to recalibrate metrics</p>
-            </div>
-        </div>
 
-        <div class="grid-2">
-            <div class="form-group">
-                <label for="fullName" data-i18n="labelFullName">Full Name</label>
-                <input type="text" id="fullName" placeholder="Name" onchange="saveUserProfile()">
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="fullName" data-i18n="labelFullName">Full Name</label>
+                    <input type="text" id="fullName" placeholder="Name" onchange="saveUserProfile(event)">
+                </div>
+                <div class="form-group">
+                    <label for="age" data-i18n="labelAge">Age</label>
+                    <input type="number" id="age" placeholder="Age" onchange="saveUserProfile(event)">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="age" data-i18n="labelAge">Age</label>
-                <input type="number" id="age" placeholder="Age" onchange="saveUserProfile()">
-            </div>
-        </div>
 
-        <div class="grid-3">
-            <div class="form-group">
-                <label for="heightFeet" data-i18n="labelHeightFeet">Height (Feet)</label>
-                <input type="number" id="heightFeet" placeholder="5" onchange="saveUserProfile()">
+            <div class="grid-3">
+                <div class="form-group">
+                    <label for="heightFeet" data-i18n="labelHeightFeet">Height (Feet)</label>
+                    <input type="number" id="heightFeet" placeholder="5" onchange="saveUserProfile(event)">
+                </div>
+                <div class="form-group">
+                    <label for="heightInches" data-i18n="labelHeightInches">Height (Inches)</label>
+                    <input type="number" id="heightInches" placeholder="10" onchange="saveUserProfile(event)">
+                </div>
+                <div class="form-group">
+                    <label for="weight" data-i18n="labelWeight">Weight (lbs)</label>
+                    <input type="number" id="weight" placeholder="190" oninput="updateProfileWeight(this.value, event)">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="heightInches" data-i18n="labelHeightInches">Height (Inches)</label>
-                <input type="number" id="heightInches" placeholder="10" onchange="saveUserProfile()">
-            </div>
-            <div class="form-group">
-                <label for="weight" data-i18n="labelWeight">Weight (lbs)</label>
-                <input type="number" id="weight" placeholder="190" oninput="updateProfileWeight(this.value)">
-            </div>
-        </div>
 
-        <div class="grid-3">
-            <div class="form-group">
-                <label for="bodyType" data-i18n="labelBodyType">Body Type</label>
-                <select id="bodyType" onchange="saveUserProfile()">
-                    <option value="ectomorph" data-i18n="optEctomorph">Ectomorph</option>
-                    <option value="mesomorph" data-i18n="optMesomorph">Mesomorph</option>
-                    <option value="endomorph" selected data-i18n="optEndomorph">Endomorph</option>
-                </select>
+            <div class="grid-3">
+                <div class="form-group">
+                    <label for="bodyType" data-i18n="labelBodyType">Body Type</label>
+                    <select id="bodyType" onchange="saveUserProfile(event)">
+                        <option value="ectomorph" data-i18n="optEctomorph">Ectomorph</option>
+                        <option value="mesomorph" data-i18n="optMesomorph">Mesomorph</option>
+                        <option value="endomorph" selected data-i18n="optEndomorph">Endomorph</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fitnessGoal" data-i18n="labelFitnessGoal">Primary Goal</label>
+                    <select id="fitnessGoal" onchange="calculateProtein(); saveUserProfile(event);">
+                        <option value="fat_loss" selected data-i18n="optFatLoss">Fat Loss</option>
+                        <option value="hypertrophy" data-i18n="optMuscleGain">Muscle Gain</option>
+                        <option value="maintenance" data-i18n="optMaintenance">Maintenance</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="activityLevel" data-i18n="labelActivityLevel">Activity Level</label>
+                    <select id="activityLevel" onchange="calculateProtein(); saveUserProfile(event);">
+                        <option value="moderate" selected data-i18n="optModExercise">Moderate Exercise</option>
+                        <option value="heavy" data-i18n="optHeavyResistance">Heavy Resistance</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="fitnessGoal" data-i18n="labelFitnessGoal">Primary Goal</label>
-                <select id="fitnessGoal" onchange="calculateProtein(); saveUserProfile();">
-                    <option value="fat_loss" selected data-i18n="optFatLoss">Fat Loss</option>
-                    <option value="hypertrophy" data-i18n="optMuscleGain">Muscle Gain</option>
-                    <option value="maintenance" data-i18n="optMaintenance">Maintenance</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="activityLevel" data-i18n="labelActivityLevel">Activity Level</label>
-                <select id="activityLevel" onchange="calculateProtein(); saveUserProfile();">
-                    <option value="moderate" selected data-i18n="optModExercise">Moderate Exercise</option>
-                    <option value="heavy" data-i18n="optHeavyResistance">Heavy Resistance</option>
-                </select>
-            </div>
-        </div>
+            <button type="submit" class="btn-primary" style="margin-top: 12px;" onclick="saveUserProfile(event)" data-i18n="btnSaveProfile">Save Profile</button>
+        </form>
     </section>
 
     <!-- Daily Targets -->
@@ -700,6 +703,8 @@
         firebase.initializeApp(firebaseConfig);
     }
 
+    const db = firebase.firestore();
+
     // Global State
     let currentLang = 'en';
     let weightLogs = JSON.parse(localStorage.getItem('weightLogs') || '[]');
@@ -731,6 +736,7 @@
             labelActivityLevel: "Activity Level",
             optModExercise: "Moderate Exercise",
             optHeavyResistance: "Heavy Resistance",
+            btnSaveProfile: "Save Profile",
             nutritionCalibration: "Nutrition Calibration",
             tipNotice: "💡 <strong>Tip:</strong> Click any metric box or the <strong>\"💡 Explain\"</strong> button below to open an explanation modal breaking down what that macro is and why it matters.",
             targetProtein: "Target Protein",
@@ -799,6 +805,7 @@
             labelActivityLevel: "Nivel de Actividad",
             optModExercise: "Ejercicio Moderado",
             optHeavyResistance: "Resistencia Pesada",
+            btnSaveProfile: "Guardar Perfil",
             nutritionCalibration: "Calibración Nutricional",
             tipNotice: "💡 <strong>Consejo:</strong> Haga clic en cualquier casilla o en el botón <strong>\"💡 Explicar\"</strong> para abrir una ventana explicativa detallada.",
             targetProtein: "Proteína Objetivo",
@@ -916,7 +923,9 @@
         renderCalendar();
     }
 
-    function saveUserProfile() {
+    async function saveUserProfile(event) {
+        if (event) event.preventDefault();
+
         const profile = {
             fullName: document.getElementById('fullName').value,
             age: document.getElementById('age').value,
@@ -925,9 +934,21 @@
             weight: document.getElementById('weight').value,
             bodyType: document.getElementById('bodyType').value,
             fitnessGoal: document.getElementById('fitnessGoal').value,
-            activityLevel: document.getElementById('activityLevel').value
+            activityLevel: document.getElementById('activityLevel').value,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
+
         localStorage.setItem('userProfile', JSON.stringify(profile));
+
+        const user = firebase.auth().currentUser;
+        if (user) {
+            try {
+                await db.collection('users').doc(user.uid).set(profile, { merge: true });
+                console.log("Profile successfully saved to Firestore.");
+            } catch (error) {
+                console.error("Error saving profile to Firestore:", error);
+            }
+        }
     }
 
     function loadUserProfile() {
@@ -967,8 +988,8 @@
         }
     }
 
-    function updateProfileWeight(val) {
-        saveUserProfile();
+    function updateProfileWeight(val, event) {
+        saveUserProfile(event);
         calculateProtein();
     }
 
@@ -1196,23 +1217,21 @@
         setTimeout(() => msg.style.display = 'none', 3000);
     }
 
-function handleLogout() {
-    // Clear all client-side cached data
-    localStorage.clear();
-    sessionStorage.clear();
+    function handleLogout() {
+        localStorage.clear();
+        sessionStorage.clear();
 
-    if (typeof firebase !== 'undefined' && firebase.auth()) {
-        firebase.auth().signOut().then(() => {
-            // Redirect with explicit query parameter after successful sign out
+        if (typeof firebase !== 'undefined' && firebase.auth()) {
+            firebase.auth().signOut().then(() => {
+                window.location.href = "index.html?logout=true";
+            }).catch((error) => {
+                console.error("Sign out error:", error);
+                window.location.href = "index.html?logout=true";
+            });
+        } else {
             window.location.href = "index.html?logout=true";
-        }).catch((error) => {
-            console.error("Sign out error:", error);
-            window.location.href = "index.html?logout=true";
-        });
-    } else {
-        window.location.href = "index.html?logout=true";
+        }
     }
-}
 
     // Initialization
     window.onload = function() {
@@ -1224,18 +1243,5 @@ function handleLogout() {
         renderCalendar();
     };
 </script>
-function handleLogout() {
-    firebase.auth().signOut().then(() => {
-        // Clear stored session data
-        localStorage.removeItem('userProfile');
-        
-        // Redirect to index.html
-        window.location.href = "index.html";
-    }).catch((error) => {
-        console.error("Sign out error:", error);
-        // Redirect anyway even if there's an error
-        window.location.href = "index.html";
-    });
-}
 </body>
 </html>
