@@ -1247,20 +1247,16 @@
         setTimeout(() => { document.getElementById('subSuccessMsg').style.display = 'none'; }, 3000);
     }
 
-    function handleLogout() {
-        firebase.auth().signOut().then(() => {
-            window.location.href = "index.html";
-        });
-    }
-<script>
-    // 1. Firebase configuration and initialization (auth, db variables)
-    // ...
+ function handleLogout() {
+    firebase.auth().signOut().then(() => {
+        window.location.href = "index.html?logout=true";
+    });
+}
 
-    // 2. PASTE THE FUNCTION HERE:
-    async function loadUserProfileFromFirestore(uid) {
-        try {
-            const docRef = db.collection('users').doc(uid);
-            const docSnap = await docRef.get();
+async function loadUserProfileFromFirestore(uid) {
+    try {
+        const docRef = db.collection('users').doc(uid);
+        const docSnap = await docRef.get();
 
             if (docSnap.exists) {
                 const data = docSnap.data();
