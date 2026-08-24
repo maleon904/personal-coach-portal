@@ -328,15 +328,20 @@
         if (isLoggingOut) {
             auth.signOut().then(() => {
                 revealUI();
-                // Clean URL query parameters
                 window.history.replaceState({}, document.title, window.location.pathname);
             }).catch(() => revealUI());
         } else {
             auth.onAuthStateChanged((user) => {
+                const loadingOverlay = document.getElementById('auth-loader');
+                const loginContainer = document.getElementById('authContainer');
+
                 if (user && window.location.protocol !== 'file:') {
-                    window.location.replace('Form.html');
+                    // User is signed in, send them to the form/dashboard
+                    window.location.href = "Form.html";
                 } else {
-                    revealUI();
+                    // No user is signed in — hide loading screen and show login form
+                    if (loadingOverlay) loadingOverlay.style.display = 'none';
+                    if (loginContainer) loginContainer.style.display = 'block';
                 }
             });
         }
