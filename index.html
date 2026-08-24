@@ -336,13 +336,15 @@ if (isLoggingOut) {
         });
     } else {
         // Only attach listener if we are not processing a logout action
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                window.location.href = "Form.html";
-            } else {
-                revealUI();
-            }
-        });
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        // User is logged in -> redirect to dashboard
+        window.location.href = "Form.html";
+    } else {
+        // No session found -> hide spinner and reveal login form
+        revealUI();
+    }
+});
     }
 }
         } else {
