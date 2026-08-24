@@ -459,7 +459,7 @@
 
 <header>
     <div class="header-brand">
-        <img src="Logo1.JPG" alt="Logo" class="header-logo">
+        <img src="Logo1.JPG" alt="Logo" class="header-logo" onerror="this.style.display='none'">
         <span class="header-title" data-i18n="headerTitle">Client Dashboard</span>
     </div>
     <div class="header-controls">
@@ -490,22 +490,22 @@
         <div class="grid-2">
             <div class="form-group">
                 <label for="fullName" data-i18n="labelFullName">Full Name</label>
-                <input type="text" id="fullName" placeholder="Name">
+                <input type="text" id="fullName" placeholder="Name" onchange="saveUserProfile()">
             </div>
             <div class="form-group">
                 <label for="age" data-i18n="labelAge">Age</label>
-                <input type="number" id="age" placeholder="Age">
+                <input type="number" id="age" placeholder="Age" onchange="saveUserProfile()">
             </div>
         </div>
 
         <div class="grid-3">
             <div class="form-group">
                 <label for="heightFeet" data-i18n="labelHeightFeet">Height (Feet)</label>
-                <input type="number" id="heightFeet" placeholder="5">
+                <input type="number" id="heightFeet" placeholder="5" onchange="saveUserProfile()">
             </div>
             <div class="form-group">
                 <label for="heightInches" data-i18n="labelHeightInches">Height (Inches)</label>
-                <input type="number" id="heightInches" placeholder="10">
+                <input type="number" id="heightInches" placeholder="10" onchange="saveUserProfile()">
             </div>
             <div class="form-group">
                 <label for="weight" data-i18n="labelWeight">Weight (lbs)</label>
@@ -516,7 +516,7 @@
         <div class="grid-3">
             <div class="form-group">
                 <label for="bodyType" data-i18n="labelBodyType">Body Type</label>
-                <select id="bodyType">
+                <select id="bodyType" onchange="saveUserProfile()">
                     <option value="ectomorph" data-i18n="optEctomorph">Ectomorph</option>
                     <option value="mesomorph" data-i18n="optMesomorph">Mesomorph</option>
                     <option value="endomorph" selected data-i18n="optEndomorph">Endomorph</option>
@@ -524,7 +524,7 @@
             </div>
             <div class="form-group">
                 <label for="fitnessGoal" data-i18n="labelFitnessGoal">Primary Goal</label>
-                <select id="fitnessGoal" onchange="calculateProtein()">
+                <select id="fitnessGoal" onchange="calculateProtein(); saveUserProfile();">
                     <option value="fat_loss" selected data-i18n="optFatLoss">Fat Loss</option>
                     <option value="hypertrophy" data-i18n="optMuscleGain">Muscle Gain</option>
                     <option value="maintenance" data-i18n="optMaintenance">Maintenance</option>
@@ -532,7 +532,7 @@
             </div>
             <div class="form-group">
                 <label for="activityLevel" data-i18n="labelActivityLevel">Activity Level</label>
-                <select id="activityLevel" onchange="calculateProtein()">
+                <select id="activityLevel" onchange="calculateProtein(); saveUserProfile();">
                     <option value="moderate" selected data-i18n="optModExercise">Moderate Exercise</option>
                     <option value="heavy" data-i18n="optHeavyResistance">Heavy Resistance</option>
                 </select>
@@ -687,10 +687,23 @@
 </div>
 
 <script>
+    // Firebase Config Placeholder (Initialize if not already done externally)
+    if (!firebase.apps.length) {
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+    }
+
     // Global State
     let currentLang = 'en';
-    let weightLogs = [];
-    let completedCalendarDays = {};
+    let weightLogs = JSON.parse(localStorage.getItem('weightLogs') || '[]');
+    let completedCalendarDays = JSON.parse(localStorage.getItem('calendarDays') || '{}');
     let currentDate = new Date();
 
     // --- TRANSLATIONS DICTIONARY ---
@@ -827,54 +840,62 @@
             recTargetTitle: "Trayectoria Objetivo Alcanzada",
             recTargetText: "Ha perdido {diff} lbs en registros recientes. Mantenga los niveles actuales para preservar la masa muscular.",
             recCalorieTitle: "Ajuste Calórico Recomendado",
-            recCalorieText: "El peso aumentó en {diff} lbs. Considere ajustar ligeramente el consumo calórico y las proteínas.",
-            recStableTitle: "Mantenimiento Estabilizado",
-            recStableText: "Su peso corporal se mantiene constante. Continúe con el plan de entrenamiento actual."
+            recCalorieText: "El peso aumentó en {diff} lbs. Considere aumentar ligeramente la ingesta de proteínas y auditar las calorías no esenciales.",
+            recStableTitle: "Mantenimiento de Peso Estable",
+            recStableText: "Su peso corporal se mantiene constante. Continúe con el plan de entrenamiento y nutrición actual."
         }
     };
 
+    // --- MACRO EXPLANATION MODAL TEXTS ---
     const macroExplanations = {
-        en: {
-            protein: "Protein is essential for muscle tissue repair and retention during fat loss phases or hypertrophy goals.",
-            ratio: "Ratio Rate expresses grams of protein per pound of body weight to calibrate optimal metabolic intake.",
-            perMeal: "Dividing total protein across 4 balanced meals maximizes protein synthesis and muscle protein retention.",
-            calories: "Total daily caloric target designed to support your targeted fitness goal without metabolic slowing.",
-            carbs: "Primary fuel source for high-intensity training, workout performance, and central nervous system support.",
-            fats: "Essential for hormone production, joint health, and overall daily metabolic health.",
-            water: "Hydration target calculated to keep metabolic processes optimized and reduce intracellular water retention."
+        protein: {
+            en: "Protein is essential for rebuilding muscle fibers, stabilizing insulin, and maximizing satiety while in a deficit.",
+            es: "La proteína es esencial para reconstruir las fibras musculares, estabilizar la insulina y maximizar la saciedad."
         },
-        es: {
-            protein: "La proteína es esencial para la reparación muscular y la retención de tejido durante fases de pérdida de grasa o hipertrofia.",
-            ratio: "La Tasa de Proporción expresa los gramos de proteína por libra de peso corporal para calcular el consumo ideal.",
-            perMeal: "Dividir la proteína total en 4 comidas optimiza la síntesis de proteínas durante el día.",
-            calories: "Calorías diarias totales calculadas para lograr tu objetivo físico de manera eficiente.",
-            carbs: "Fuente principal de energía para entrenamientos intensos y rendimiento físico.",
-            fats: "Esenciales para la regulación hormonal y la salud de las articulaciones.",
-            water: "Meta de hidratación calculada para optimizar los procesos metabólicos y evitar la retención de líquidos."
+        ratio: {
+            en: "Ratio Rate reflects grams of protein assigned per pound of body weight based on activity and fitness target.",
+            es: "La Tasa de Proporción refleja los gramos de proteína asignados por libra de peso corporal según su nivel de actividad."
+        },
+        perMeal: {
+            en: "Dividing total daily protein into 4 distinct meals maximizes muscle protein synthesis (MPS) across the day.",
+            es: "Dividir la proteína diaria total en 4 comidas optimiza la síntesis de proteína muscular a lo largo del día."
+        },
+        calories: {
+            en: "Caloric intake calibrated to hit your energetic baseline target for sustainable body re-composition.",
+            es: "Ingesta calórica calibrada para alcanzar su objetivo energético base para la recomposición corporal."
+        },
+        carbs: {
+            en: "Carbohydrates provide glucose for fuel, restoring glycogen stores for intensive resistance training sessions.",
+            es: "Los carbohidratos proporcionan glucosa para reponer las reservas de glucógeno para el entrenamiento de fuerza."
+        },
+        fats: {
+            en: "Healthy dietary fats support hormone production, cognitive health, and joint lubrication.",
+            es: "Las grasas saludables respaldan la producción hormonal, la salud cognitiva y la lubricación articular."
+        },
+        water: {
+            en: "Optimal hydration drives nutrient delivery, cell volumetric expansion, and waste metabolite clearance.",
+            es: "La hidratación óptima impulsa la entrega de nutrientes y la eliminación de desechos metabólicos."
         }
     };
 
-    // Language Switcher
+    // Switch Application Language
     function switchLanguage(lang) {
         currentLang = lang;
-        const elements = document.querySelectorAll('[data-i18n]');
-        elements.forEach(el => {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
-            if (translations[lang] && translations[lang][key]) {
-                if (el.tagName === 'OPTION') {
-                    el.textContent = translations[lang][key];
-                } else if (el.children.length > 0 && el.querySelector('strong')) {
-                    el.innerHTML = translations[lang][key];
+            if (translations[lang][key]) {
+                if (el.tagName === 'INPUT' && el.placeholder) {
+                    el.placeholder = translations[lang][key];
                 } else {
-                    el.textContent = translations[lang][key];
+                    el.innerHTML = translations[lang][key];
                 }
             }
         });
-        renderWeightTable();
+        renderWeightLogs();
         renderCalendar();
     }
 
-    // Calculations
+    // Auto Calculate Nutrients
     function calculateProtein() {
         const weight = parseFloat(document.getElementById('weight').value) || 0;
         const goal = document.getElementById('fitnessGoal').value;
@@ -883,130 +904,158 @@
         let ratio = 1.0;
         if (goal === 'fat_loss') ratio = activity === 'heavy' ? 1.1 : 1.05;
         else if (goal === 'hypertrophy') ratio = activity === 'heavy' ? 1.2 : 1.1;
-        else ratio = 1.0;
+        else ratio = 0.9;
 
-        const targetProtein = Math.round(weight * ratio);
-        const perMeal = Math.round(targetProtein / 4);
-        const calories = Math.round(weight * (goal === 'fat_loss' ? 12 : goal === 'hypertrophy' ? 16 : 14));
-        const fats = Math.round((calories * 0.25) / 9);
-        const carbs = Math.round((calories - (targetProtein * 4) - (fats * 9)) / 4);
+        const totalProtein = Math.round(weight * ratio);
+        const perMealGrams = Math.round(totalProtein / 4);
+        const totalCalories = Math.round(weight * (goal === 'fat_loss' ? 11 : goal === 'hypertrophy' ? 15 : 13));
+        const carbs = Math.round((totalCalories * 0.35) / 4);
+        const fats = Math.round((totalCalories * 0.25) / 9);
         const water = Math.round(weight * 0.67);
 
-        document.getElementById('targetGrams').innerText = targetProtein + 'g';
-        document.getElementById('targetRatio').innerText = ratio.toFixed(2) + ' g/lb';
-        document.getElementById('perMeal').innerText = perMeal + 'g';
-        document.getElementById('targetCalories').innerText = calories + ' kcal';
-        document.getElementById('targetCarbs').innerText = Math.max(0, carbs) + 'g';
-        document.getElementById('targetFats').innerText = fats + 'g';
-        document.getElementById('targetWater').innerText = water + ' oz';
+        document.getElementById('targetGrams').innerText = `${totalProtein}g`;
+        document.getElementById('targetRatio').innerText = `${ratio.toFixed(2)} g/lb`;
+        document.getElementById('perMeal').innerText = `${perMealGrams}g`;
+        document.getElementById('targetCalories').innerText = `${totalCalories} kcal`;
+        document.getElementById('targetCarbs').innerText = `${carbs}g`;
+        document.getElementById('targetFats').innerText = `${fats}g`;
+        document.getElementById('targetWater').innerText = `${water} oz`;
     }
 
     function updateProfileWeight(val) {
         calculateProtein();
+        saveUserProfile();
     }
 
-    // Explanations Modal
-    function explainMacro(type) {
-        const titleMap = {
-            protein: "Target Protein", ratio: "Ratio Rate", perMeal: "Per Meal Target",
-            calories: "Daily Calories", carbs: "Carbohydrates", fats: "Dietary Fats", water: "Hydration Target"
+    // Save and Load Profile with Firestore
+    async function saveUserProfile() {
+        const user = firebase.auth().currentUser;
+        const profileData = {
+            fullName: document.getElementById('fullName').value,
+            age: document.getElementById('age').value,
+            heightFeet: document.getElementById('heightFeet').value,
+            heightInches: document.getElementById('heightInches').value,
+            weight: document.getElementById('weight').value,
+            bodyType: document.getElementById('bodyType').value,
+            fitnessGoal: document.getElementById('fitnessGoal').value,
+            activityLevel: document.getElementById('activityLevel').value
         };
-        document.getElementById('modalTitle').innerText = titleMap[type] || "Explanation";
-        document.getElementById('modalMessageBody').innerText = macroExplanations[currentLang][type] || "";
-        document.getElementById('devModal').style.display = 'flex';
+
+        if (user) {
+            try {
+                await firebase.firestore().collection('clients').doc(user.uid).set(profileData, { merge: true });
+            } catch (err) {
+                console.error("Firestore Save Error:", err);
+            }
+        }
+        localStorage.setItem('userProfile', JSON.stringify(profileData));
+    }
+
+    // Modal Operations
+    function explainMacro(type) {
+        const modal = document.getElementById('devModal');
+        const title = document.getElementById('modalTitle');
+        const body = document.getElementById('modalMessageBody');
+        title.innerText = type.toUpperCase();
+        body.innerText = macroExplanations[type][currentLang] || macroExplanations[type]['en'];
+        modal.style.display = 'flex';
     }
 
     function closeModal() {
         document.getElementById('devModal').style.display = 'none';
     }
 
-    // Image Upload Preview
-    function previewImage(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = document.getElementById('profileImg');
-                img.src = e.target.result;
-                img.style.display = 'block';
-                document.getElementById('uploadText').style.display = 'none';
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // Weight Logging & Logic
+    // Weight Log Management
     function addWeightLog() {
         const date = document.getElementById('logDate').value;
         const weight = parseFloat(document.getElementById('logWeight').value);
 
-        if (!date || isNaN(weight)) return;
+        if (!date || isNaN(weight)) return alert("Please enter a valid date and weight.");
 
-        weightLogs.push({ date, weight });
-        weightLogs.sort((a, b) => new Date(a.date) - new Date(b.date));
-
+        weightLogs.unshift({ id: Date.now(), date, weight });
+        localStorage.setItem('weightLogs', JSON.stringify(weightLogs));
         document.getElementById('logWeight').value = '';
-        renderWeightTable();
+        renderWeightLogs();
     }
 
-    function deleteLog(index) {
-        weightLogs.splice(index, 1);
-        renderWeightTable();
+    function deleteWeightLog(id) {
+        weightLogs = weightLogs.filter(item => item.id !== id);
+        localStorage.setItem('weightLogs', JSON.stringify(weightLogs));
+        renderWeightLogs();
     }
 
-    function renderWeightTable() {
+    function renderWeightLogs() {
         const tbody = document.getElementById('weightHistoryBody');
         tbody.innerHTML = '';
 
-        if (weightLogs.length === 0) {
-            document.getElementById('recTitle').innerText = translations[currentLang].recProcessingTitle;
-            document.getElementById('recText').innerText = translations[currentLang].recProcessingText;
-            return;
-        }
-
-        let firstWeight = weightLogs[0].weight;
+        weightLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         weightLogs.forEach((log, index) => {
-            const diff = (log.weight - firstWeight).toFixed(1);
-            let statusBadge = '';
+            let diffStr = '-';
+            let badgeClass = 'badge-blue';
+            let statusText = translations[currentLang].badgeBaseline;
 
-            if (index === 0) {
-                statusBadge = `<span class="status-badge badge-blue">${translations[currentLang].badgeBaseline}</span>`;
-            } else if (diff < 0) {
-                statusBadge = `<span class="status-badge badge-green">${translations[currentLang].badgeOnTrack}</span>`;
-            } else if (diff > 0) {
-                statusBadge = `<span class="status-badge badge-orange">${translations[currentLang].badgeSurplus}</span>`;
-            } else {
-                statusBadge = `<span class="status-badge badge-blue">${translations[currentLang].badgeMaintained}</span>`;
+            if (index < weightLogs.length - 1) {
+                const prev = weightLogs[index + 1].weight;
+                const diff = (log.weight - prev).toFixed(1);
+                diffStr = `${diff > 0 ? '+' : ''}${diff} lbs`;
+
+                if (diff < 0) {
+                    badgeClass = 'badge-green';
+                    statusText = translations[currentLang].badgeOnTrack;
+                } else if (diff > 0) {
+                    badgeClass = 'badge-orange';
+                    statusText = translations[currentLang].badgeSurplus;
+                } else {
+                    badgeClass = 'badge-blue';
+                    statusText = translations[currentLang].badgeMaintained;
+                }
             }
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${log.date}</td>
                 <td>${log.weight} lbs</td>
-                <td>${diff > 0 ? '+' + diff : diff} lbs</td>
-                <td>${statusBadge}</td>
-                <td style="text-align: center;"><button class="btn-delete" onclick="deleteLog(${index})">✕</button></td>
+                <td>${diffStr}</td>
+                <td><span class="status-badge ${badgeClass}">${statusText}</span></td>
+                <td style="text-align: center;"><button class="btn-delete" onclick="deleteWeightLog(${log.id})">&times;</button></td>
             `;
             tbody.appendChild(tr);
         });
 
-        const latestDiff = (weightLogs[weightLogs.length - 1].weight - firstWeight).toFixed(1);
-        if (latestDiff < 0) {
-            document.getElementById('recTitle').innerText = translations[currentLang].recTargetTitle;
-            document.getElementById('recText').innerText = translations[currentLang].recTargetText.replace('{diff}', Math.abs(latestDiff));
-        } else if (latestDiff > 0) {
-            document.getElementById('recTitle').innerText = translations[currentLang].recCalorieTitle;
-            document.getElementById('recText').innerText = translations[currentLang].recCalorieText.replace('{diff}', latestDiff);
+        updateRecommendations();
+    }
+
+    function updateRecommendations() {
+        const titleEl = document.getElementById('recTitle');
+        const textEl = document.getElementById('recText');
+
+        if (weightLogs.length < 2) {
+            titleEl.innerText = translations[currentLang].recProcessingTitle;
+            textEl.innerText = translations[currentLang].recProcessingText;
+            return;
+        }
+
+        const latest = weightLogs[0].weight;
+        const previous = weightLogs[weightLogs.length - 1].weight;
+        const diff = (latest - previous).toFixed(1);
+
+        if (diff < 0) {
+            titleEl.innerText = translations[currentLang].recTargetTitle;
+            textEl.innerText = translations[currentLang].recTargetText.replace('{diff}', Math.abs(diff));
+        } else if (diff > 0) {
+            titleEl.innerText = translations[currentLang].recCalorieTitle;
+            textEl.innerText = translations[currentLang].recCalorieText.replace('{diff}', diff);
         } else {
-            document.getElementById('recTitle').innerText = translations[currentLang].recStableTitle;
-            document.getElementById('recText').innerText = translations[currentLang].recStableText;
+            titleEl.innerText = translations[currentLang].recStableTitle;
+            textEl.innerText = translations[currentLang].recStableText;
         }
     }
 
     function exportWeightLogsCSV() {
-        if (weightLogs.length === 0) return;
-        let csvContent = "data:text/csv;charset=utf-8,Date,Weight\n" + weightLogs.map(e => `${e.date},${e.weight}`).join("\n");
+        if (weightLogs.length === 0) return alert("No logs available to export.");
+        let csvContent = "data:text/csv;charset=utf-8,Date,Weight(lbs)\n";
+        weightLogs.forEach(log => { csvContent += `${log.date},${log.weight}\n`; });
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
@@ -1016,71 +1065,81 @@
         document.body.removeChild(link);
     }
 
-    // Compliance Calendar
-    function changeMonth(direction) {
-        currentDate.setMonth(currentDate.getMonth() + direction);
+    // Calendar Operations
+    function changeMonth(delta) {
+        currentDate.setMonth(currentDate.getMonth() + delta);
         renderCalendar();
     }
 
-    function toggleDayCompletion(dayKey) {
+    function toggleCalendarDay(dayKey) {
         completedCalendarDays[dayKey] = !completedCalendarDays[dayKey];
+        localStorage.setItem('calendarDays', JSON.stringify(completedCalendarDays));
         renderCalendar();
     }
 
     function renderCalendar() {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        document.getElementById('calendarMonthYear').innerText = `${monthNames[month]} ${year}`;
-
         const grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
 
-        const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-        days.forEach(d => {
-            const dayHead = document.createElement('div');
-            dayHead.className = 'day-header';
-            dayHead.innerText = d;
-            grid.appendChild(dayHead);
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        document.getElementById('calendarMonthYear').innerText = new Date(year, month).toLocaleString(currentLang, { month: 'long', year: 'numeric' });
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDayIndex = new Date(year, month, 1).getDay();
+
+        const dayNames = currentLang === 'es' ? ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        dayNames.forEach(d => {
+            const dh = document.createElement('div');
+            dh.className = 'day-header';
+            dh.innerText = d;
+            grid.appendChild(dh);
         });
 
-        for (let i = 0; i < firstDay; i++) {
+        for (let i = 0; i < firstDayIndex; i++) {
             const empty = document.createElement('div');
             empty.className = 'calendar-day empty';
             grid.appendChild(empty);
         }
 
         let completedCount = 0;
+        const todayStr = new Date().toISOString().split('T')[0];
+
         for (let day = 1; day <= daysInMonth; day++) {
-            const dayKey = `${year}-${month + 1}-${day}`;
-            const dayDiv = document.createElement('div');
-            dayDiv.className = 'calendar-day';
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const cell = document.createElement('div');
+            cell.className = 'calendar-day';
+            cell.innerText = day;
 
-            const today = new Date();
-            if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) {
-                dayDiv.classList.add('today');
-            }
-
-            if (completedCalendarDays[dayKey]) {
-                dayDiv.classList.add('completed');
+            if (dateStr === todayStr) cell.classList.add('today');
+            if (completedCalendarDays[dateStr]) {
+                cell.classList.add('completed');
                 completedCount++;
             }
 
-            dayDiv.innerText = day;
-            dayDiv.onclick = () => toggleDayCompletion(dayKey);
-            grid.appendChild(dayDiv);
+            cell.onclick = () => toggleCalendarDay(dateStr);
+            grid.appendChild(cell);
         }
 
-        const percentage = Math.round((completedCount / daysInMonth) * 100);
-        document.getElementById('adherencePercent').innerText = `${percentage}%`;
-        document.getElementById('adherenceFill').style.width = `${percentage}%`;
+        const score = Math.round((completedCount / daysInMonth) * 100);
+        document.getElementById('adherencePercent').innerText = `${score}%`;
+        document.getElementById('adherenceFill').style.width = `${score}%`;
         document.getElementById('adherenceStats').innerText = `${completedCount} of ${daysInMonth} ${translations[currentLang].daysCompleted}`;
     }
 
-    // Forms & Settings
+    // Communication Preferences & Profile Upload Preview
+    function previewImage(event) {
+        const reader = new FileReader();
+        reader.onload = function () {
+            const img = document.getElementById('profileImg');
+            img.src = reader.result;
+            img.style.display = 'block';
+            document.getElementById('uploadText').style.display = 'none';
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+
     function saveNotificationPrefs(e) {
         e.preventDefault();
         const msg = document.getElementById('subSuccessMsg');
@@ -1089,15 +1148,51 @@
     }
 
     function handleLogout() {
-        alert("Signed out successfully.");
+        firebase.auth().signOut().then(() => alert("Logged out successfully.")).catch(() => alert("Logged out locally."));
     }
 
-    // Initial Setup
-    window.onload = function() {
+    // Init & Auth Binding
+    document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
+        
+        // Restore local profile fallback
+        const savedProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        if (savedProfile.fullName) document.getElementById('fullName').value = savedProfile.fullName;
+        if (savedProfile.age) document.getElementById('age').value = savedProfile.age;
+        if (savedProfile.heightFeet) document.getElementById('heightFeet').value = savedProfile.heightFeet;
+        if (savedProfile.heightInches) document.getElementById('heightInches').value = savedProfile.heightInches;
+        if (savedProfile.weight) document.getElementById('weight').value = savedProfile.weight;
+        if (savedProfile.bodyType) document.getElementById('bodyType').value = savedProfile.bodyType;
+        if (savedProfile.fitnessGoal) document.getElementById('fitnessGoal').value = savedProfile.fitnessGoal;
+        if (savedProfile.activityLevel) document.getElementById('activityLevel').value = savedProfile.activityLevel;
+
         calculateProtein();
+        renderWeightLogs();
         renderCalendar();
-    };
+
+        // Firebase Auth Binding
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const doc = await firebase.firestore().collection('clients').doc(user.uid).get();
+                    if (doc.exists) {
+                        const data = doc.data();
+                        if (data.fullName) document.getElementById('fullName').value = data.fullName;
+                        if (data.age) document.getElementById('age').value = data.age;
+                        if (data.heightFeet) document.getElementById('heightFeet').value = data.heightFeet;
+                        if (data.heightInches) document.getElementById('heightInches').value = data.heightInches;
+                        if (data.weight) document.getElementById('weight').value = data.weight;
+                        if (data.bodyType) document.getElementById('bodyType').value = data.bodyType;
+                        if (data.fitnessGoal) document.getElementById('fitnessGoal').value = data.fitnessGoal;
+                        if (data.activityLevel) document.getElementById('activityLevel').value = data.activityLevel;
+                        calculateProtein();
+                    }
+                } catch (e) {
+                    console.log("Firestore load error:", e);
+                }
+            }
+        });
+    });
 </script>
 </body>
 </html>
