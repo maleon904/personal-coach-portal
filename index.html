@@ -331,6 +331,19 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             }).catch(() => revealUI());
         } else {
+        // User is not logging out, so listen for existing auth state
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is authenticated, send to dashboard
+                window.location.href = "Form.html";
+            } else {
+                // No user logged in, reveal the login form
+                revealUI();
+            }
+        });
+    }
+}
+        } else {
             auth.onAuthStateChanged((user) => {
                 const loadingOverlay = document.getElementById('auth-loader');
                 const loginContainer = document.getElementById('authContainer');
