@@ -926,35 +926,42 @@
 
     // 4. Load User Profile & Data from Firestore
     async function loadUserProfileFromFirestore(uid) {
-        try {
-            const docRef = db.collection('users').doc(uid);
-            const docSnap = await docRef.get();
+    try {
+        const docRef = db.collection('users').doc(uid);
+        const docSnap = await docRef.get();
 
-            if (docSnap.exists) {
-                const p = docSnap.data();
-                document.getElementById('fullName').value = p.fullName || '';
-                document.getElementById('age').value = p.age || '';
-                document.getElementById('heightFeet').value = p.heightFeet || '';
-                document.getElementById('heightInches').value = p.heightInches || '';
-                document.getElementById('weight').value = p.weight || '190';
-                document.getElementById('bodyType').value = p.bodyType || 'endomorph';
-                document.getElementById('fitnessGoal').value = p.fitnessGoal || 'fat_loss';
-                document.getElementById('activityLevel').value = p.activityLevel || 'moderate';
+        if (docSnap.exists) {
+            const p = docSnap.data();
+            document.getElementById('fullName').value = p.fullName || '';
+            document.getElementById('age').value = p.age || '';
+            document.getElementById('heightFeet').value = p.heightFeet || '';
+            document.getElementById('heightInches').value = p.heightInches || '';
+            document.getElementById('weight').value = p.weight || '190';
+            document.getElementById('bodyType').value = p.bodyType || 'endomorph';
+            document.getElementById('fitnessGoal').value = p.fitnessGoal || 'fat_loss';
+            document.getElementById('activityLevel').value = p.activityLevel || 'moderate';
 
-                if (p.weightLogs) {
-                    weightLogs = p.weightLogs;
-                    renderWeightHistory();
-                }
-                if (p.calendarDays) {
-                    completedCalendarDays = p.calendarDays;
-                    renderCalendar();
-                }
-
-                calculateProtein();
+            if (p.weightLogs) {
+                weightLogs = p.weightLogs;
+                renderWeightHistory();
             }
-        } catch (err) {
-            console.error("Error retrieving user document:", err);
+            if (p.calendarDays) {
+                completedCalendarDays = p.calendarDays;
+                renderCalendar();
+            }
+        } else {
+            // New user without a profile yet: pre-fill email if available, do NOT redirect!
+            console.log("No profile document found yet. Initializing default view.");
+            if (currentUser && currentUser.email) {
+                document.getElementById('userEmail').value = currentUser.email;
+            }
         }
+        calculateProtein();
+    } catch (err) {
+        console.error("Error retrieving user document:", err);
+        // Do NOT redirect to index.html here!
+    }
+}
 
         const img = localStorage.getItem('profileImage');
         if (img) {
